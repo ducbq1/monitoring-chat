@@ -54,7 +54,7 @@
             </thead>
             <tbody>
             <tr th:each="proc, iter : ${javaProcesses}">
-                <td th:text="${iter.index + 1}"></td>
+                <td class="text-center" th:text="${iter.index + 1}"></td>
                 <td><span class="pid-badge" th:text="${proc.pid}"></span></td>
                 <td th:text="${proc.name}">main.jar</td>
                 <td>

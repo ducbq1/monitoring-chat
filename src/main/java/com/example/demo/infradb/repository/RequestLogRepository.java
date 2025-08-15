@@ -26,6 +26,9 @@ public class RequestLogRepository {
 
     public List<RequestLog> findAll(String dbName) {
         String sql = "SELECT * FROM " + getTableName();
+        var x = dynamicDataSourceConfig.getJdbcTemplate("postgres");
+        List<String> listName = x.queryForList("select name from audit", String.class);
+        System.out.println(listName);
         return dynamicDataSourceConfig.getJdbcTemplate(dbName)
                 .query(sql, new AnnotationBasedRowMapper<>(RequestLog.class));
     }

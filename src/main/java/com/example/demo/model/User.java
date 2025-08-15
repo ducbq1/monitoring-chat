@@ -13,6 +13,8 @@ public class User {
 
     private String username;
     private String fullName;
+    private String accessKey;
+    private String roles;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
@@ -67,5 +69,21 @@ public class User {
 
     public void setSubordinates(List<User> subordinates) {
         this.subordinates = subordinates;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 }

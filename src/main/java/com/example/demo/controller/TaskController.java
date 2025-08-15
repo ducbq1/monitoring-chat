@@ -44,7 +44,8 @@ public class TaskController {
         }
 
         model.addAttribute("columns", columns);
-        return "view/task-board";
+        model.addAttribute("view", "view/task-board");
+        return "layout";
     }
 
     @GetMapping("/task/new")
@@ -56,7 +57,8 @@ public class TaskController {
         }
         model.addAttribute("task", task);
         model.addAttribute("users", userService.findAllByManagerIsNull());
-        return "view/task-detail";
+        model.addAttribute("view", "view/task-detail");
+        return "layout";
     }
 
     @PostMapping("/task/save")
@@ -101,7 +103,8 @@ public class TaskController {
         model.addAttribute("task", task);
         model.addAttribute("users", users);
         model.addAttribute("comments", comments);
-        return "view/task-detail";
+        model.addAttribute("view", "view/task-detail");
+        return "layout";
     }
 
     @PostMapping("/task/{id}/change-status")

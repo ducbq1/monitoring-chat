@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-//@Component
+@Component
 public class DataSeeder implements CommandLineRunner {
 
     private final TaskService taskService;
@@ -25,6 +25,7 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) {
         // ✅ Tạo người dùng
         User ceo = new User("ceo", "Trần CEO", null);
+        ceo.setAccessKey("1111");
         User manager1 = new User("manager1", "Nguyễn Quản Lý 1", ceo);
         User manager2 = new User("manager2", "Phạm Quản Lý 2", ceo);
 

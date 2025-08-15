@@ -11,15 +11,15 @@ custom:
       password: secret
       driver-class-name: oracle.jdbc.OracleDriver
     postgres:
-      url: jdbc:postgresql://localhost:5432/testdb
-      username: postgres
-      password: secret
+      url: jdbc:postgresql://localhost:5432/mydb
+      username: myuser
+      password: mypassword
       driver-class-name: org.postgresql.Driver
     derby:
       url: jdbc:derby:memory:mydb;create=true
       username:
       password:
-      driver-class-name: org.apache.derby.jdbc.EmbeddedDriver
+      driver-class-name: org.apache.derby.iapi.jdbc.AutoloadedDriver
     fis:
       url: protocol=jdbc:fisglobal|database=ip
       username: user

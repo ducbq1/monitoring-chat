@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
 <head>
     <meta charset="UTF-8">
     <title>Task Board</title>
@@ -22,7 +22,12 @@
 </head>
 <body>
 <section class="container mt-4">
-    <h4 class="text-primary mb-3">📋 Task Board</h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="text-primary">📋 Task Board</h4>
+        <a th:href="@{/task/new}" class="btn btn-primary btn-sm d-flex align-items-center">
+            <i class="bi bi-plus-lg me-1"></i> Tạo Task
+        </a>
+    </div>
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <!-- Duyệt từng cột theo status -->
