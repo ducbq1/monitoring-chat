@@ -1,24 +1,25 @@
-package com.example.demo.config;
+package com.example.demo.seeder;
 
 import com.example.demo.model.FeignLog;
 import com.example.demo.model.UrlStatus;
 import com.example.demo.repository.FeignLogRepository;
 import com.example.demo.repository.UrlStatusRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
+//@Component
 public class DataInitializer {
 
-    @Autowired
-    private UrlStatusRepository repository;
-    @Autowired
-    private FeignLogRepository feignLogRepo;
+    private final UrlStatusRepository repository;
+    private final FeignLogRepository feignLogRepo;
+
+    public DataInitializer(UrlStatusRepository repository, FeignLogRepository feignLogRepo) {
+        this.repository = repository;
+        this.feignLogRepo = feignLogRepo;
+    }
 
     @PostConstruct
     public void init() {

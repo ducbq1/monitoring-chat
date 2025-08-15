@@ -20,8 +20,11 @@ import java.util.List;
 @Controller
 public class FeignLogController {
 
-    @Autowired
-    private FeignLogRepository repository;
+    private final FeignLogRepository repository;
+
+    public FeignLogController(FeignLogRepository repository) {
+        this.repository = repository;
+    }
 
     @GetMapping("/feign-logs")
     public String showLogs(Model model,

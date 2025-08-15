@@ -12,5 +12,4 @@ public class GlobalErrorHandler {
         return "error/404";
     }
 
-    // Xử lý lỗi khác nếu muốn
 }
