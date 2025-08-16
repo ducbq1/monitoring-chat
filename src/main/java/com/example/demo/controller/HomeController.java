@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.Note;
 import com.example.demo.model.TreeNode;
 import com.example.demo.model.UrlStatus;
@@ -81,7 +82,7 @@ public class HomeController {
         );
 
         model.addAttribute("treeData", treeData);
-        model.addAttribute("view", "view/tree");
+        ViewHelper.setView(model, "view/tree", "\uD83C\uDF33 Tree View with Details");
         return "layout"; // Load layout.html
     }
 

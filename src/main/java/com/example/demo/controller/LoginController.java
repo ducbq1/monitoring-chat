@@ -29,6 +29,7 @@ public class LoginController {
             String target = safeRedirect(redirect);
             return "redirect:" + (target != null ? target : "/dashboard");
         }
+        model.addAttribute("redirect", redirect);
         return "view/login";
     }
 
