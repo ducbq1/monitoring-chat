@@ -138,7 +138,7 @@ public class HomeController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model,
                                 @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "6") int size) {
+                                @RequestParam(defaultValue = "10") int size) {
 //        healthService.checkAll();
         Page<UrlStatus> urlPage = repo.findAll(PageRequest.of(page, size));
         model.addAttribute("urlPage", urlPage);

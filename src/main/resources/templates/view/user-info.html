@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/bootstrap-icons-1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-person-circle me-2"></i> User Information
+        </div>
+        <div class="card-body">
+            <p><strong>Full Name:</strong> <span th:text="${user.fullName}">fullName</span></p>
+            <p><strong>Username:</strong> <span th:text="${user.username}">userName</span></p>
+            <p><strong>Roles:</strong>
+                <span th:if="${user.roles != null}"
+                      th:each="role : ${#strings.arraySplit(user.roles, ',')}"
+                      class="badge bg-primary me-1"
+                      th:text="${role.trim()}">
+                    ROLE
+                </span>
+                <span th:if="${user.roles == null}">N/A</span>
+            </p>
+
+            <p><strong>Manager:</strong>
+                <span th:text="${user.manager != null ? user.manager.fullName : 'N/A'}">Manager Name</span>
+            </p>
+
+            <p><strong>Subordinates:</strong></p>
+            <ul>
+                <li th:each="sub : ${user.subordinates}" th:text="${sub.fullName}">Subordinate Name</li>
+                <li th:if="${#lists.isEmpty(user.subordinates)}">No subordinates</li>
+            </ul>
+        </div>
+        <div class="card-footer text-end">
+            <a th:href="@{/}" class="btn btn-secondary btn-sm">Back</a>
+        </div>
+    </div>
+</div>
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

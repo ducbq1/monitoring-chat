@@ -7,9 +7,9 @@
     <style>
         .ant-table {
             background-color: #fff;
-            border-radius: 10px;
+            border-radius: 0.75rem;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .ant-table thead {
@@ -21,41 +21,43 @@
             font-weight: 600;
             font-size: 14px;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid #dee2e6;
-            background-color: #9ebce9;
+            color: white;
+            background-color: cornflowerblue;
         }
 
         .ant-table td {
             font-size: 14px;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             vertical-align: middle;
         }
 
         .ant-table tbody tr:nth-child(even) {
-            background-color: #f9fafb;
+            background-color: #f8f9fa;
         }
 
         .ant-table tbody tr:hover {
-            background-color: #f1f3f5;
+            background-color: #e9ecef;
         }
 
         .badge-status {
-            padding: 4px 12px;
+            padding: 4px 10px;
             font-size: 12px;
-            border-radius: 999px;
+            border-radius: 0.35rem;
             display: inline-block;
+            font-weight: 500;
         }
 
         .status-ok {
-            background-color: #d3f9d8;
-            color: #2b8a3e;
+            background-color: #d1e7dd;
+            color: #0f5132;
         }
 
         .status-down {
-            background-color: #ffe3e3;
-            color: #c92a2a;
+            background-color: #f8d7da;
+            color: #842029;
         }
 
         .section-title {
@@ -73,13 +75,15 @@
 
         .pagination-container {
             background-color: #f8f9fa;
-            border-radius: 0 0 10px 10px;
-            padding: 12px;
+            border-radius: 0 0 0.75rem 0.75rem;
+            padding: 10px;
         }
 
         .pagination .page-link {
-            border-radius: 6px !important;
+            border-radius: 0.375rem !important;
             margin: 0 4px;
+            font-size: 0.875rem;
+            padding: 0.35rem 0.7rem;
         }
     </style>
 </head>
@@ -95,12 +99,12 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th>🌐 URL</th>
-                <th>📌 Loại</th>
-                <th>📝 Mô tả</th>
-                <th>✅ Trạng thái</th>
-                <th>⏱️ Lần kiểm tra cuối</th>
-                <th>📶 Phản hồi</th>
+                <th>URL</th>
+                <th>Loại</th>
+                <th>Mô tả</th>
+                <th>Trạng thái</th>
+                <th>Lần kiểm tra cuối</th>
+                <th>Phản hồi</th>
             </tr>
             </thead>
             <tbody>
@@ -119,22 +123,48 @@
             </tbody>
         </table>
 
-        <!-- Pagination -->
-        <div th:if="${urlPage.totalPages > 1}" class="pagination-container">
-            <nav>
-                <ul class="pagination justify-content-center mb-0">
+        <!-- Pagination + Footer -->
+        <div class="pagination-container d-flex justify-content-between align-items-center p-2 border-top bg-light rounded-bottom">
+
+            <!-- Nút phân trang bên trái -->
+            <nav th:if="${urlPage.totalPages > 1}">
+                <ul class="pagination mb-0">
                     <li class="page-item" th:classappend="${urlPage.first}? 'disabled'">
-                        <a class="page-link" th:href="@{/dashboard(page=${urlPage.number - 1})}">Trước</a>
+                        <a class="page-link" th:href="@{/dashboard(page=${urlPage.number - 1}, size=${urlPage.size})}">Trước</a>
                     </li>
                     <li class="page-item" th:each="i : ${#numbers.sequence(0, urlPage.totalPages - 1)}"
                         th:classappend="${urlPage.number == i}? 'active'">
-                        <a class="page-link" th:href="@{/dashboard(page=${i})}" th:text="${i + 1}"></a>
+                        <a class="page-link" th:href="@{/dashboard(page=${i}, size=${urlPage.size})}" th:text="${i + 1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${urlPage.last}? 'disabled'">
-                        <a class="page-link" th:href="@{/dashboard(page=${urlPage.number + 1})}">Tiếp</a>
+                        <a class="page-link" th:href="@{/dashboard(page=${urlPage.number + 1}, size=${urlPage.size})}">Tiếp</a>
                     </li>
                 </ul>
             </nav>
+
+            <!-- Phần bên phải: số bản ghi + dropdown chọn size -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <div class="text-muted small">
+                    Hiển thị từ
+                    <span th:text="${urlPage.number * urlPage.size + 1}"></span>
+                    đến
+                    <span th:text="${urlPage.number * urlPage.size + urlPage.numberOfElements}"></span>
+                    của
+                    <span th:text="${urlPage.totalElements}"></span> bản ghi
+                </div>
+
+                <!-- Dropdown chọn số bản ghi mỗi trang -->
+                <form th:action="@{/dashboard}" method="get">
+                    <input type="hidden" name="page" value="0"/>
+                    <select name="size" class="form-select form-select-sm"
+                            onchange="this.form.submit()">
+                        <option th:value="5" th:selected="${urlPage.size == 5}">5 / trang</option>
+                        <option th:value="10" th:selected="${urlPage.size == 10}">10 / trang</option>
+                        <option th:value="20" th:selected="${urlPage.size == 20}">20 / trang</option>
+                        <option th:value="50" th:selected="${urlPage.size == 50}">50 / trang</option>
+                    </select>
+                </form>
+            </div>
         </div>
     </div>
 </section>
