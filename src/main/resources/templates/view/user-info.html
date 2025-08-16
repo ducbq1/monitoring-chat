@@ -11,9 +11,9 @@
             <p><strong>Username:</strong> <span th:text="${user.username}">userName</span></p>
             <p><strong>Roles:</strong>
                 <span th:if="${user.roles != null}"
-                      th:each="role : ${#strings.arraySplit(user.roles, ',')}"
+                      th:each="role : ${user.roles}"
                       class="badge bg-primary me-1"
-                      th:text="${role.trim()}">
+                      th:text="${role.getName().trim()}">
                     ROLE
                 </span>
                 <span th:if="${user.roles == null}">N/A</span>

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.config.OnlineUserTracker;
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.ChatHistory;
 import com.example.demo.model.ChatMessage;
 import com.example.demo.repository.ChatHistoryRepository;
@@ -72,7 +73,7 @@ public class ChatController {
         } else {
             model.addAttribute("room", ""); // để client tự lấy từ localStorage
         }
-        model.addAttribute("view", "view/chat");
+        ViewHelper.setView(model, "view/chat", "Chat Room");
         return "layout"; // Load layout.html
     }
 

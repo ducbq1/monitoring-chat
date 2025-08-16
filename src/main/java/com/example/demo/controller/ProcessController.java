@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.JavaProcessInfo;
 import com.example.demo.model.Note;
 import com.example.demo.model.UrlStatus;
@@ -37,11 +38,8 @@ public class ProcessController {
                 .filter(p -> p.info().command().orElse("").contains("java"))
                 .map(JavaProcessInfo::from)
                 .collect(Collectors.toList());
-//        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Bạn không có quyền truy cập");
-//        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền truy cập");
-//        throw new AccessDeniedException("Bạn không có quyền truy cập");
         model.addAttribute("javaProcesses", processes);
-        model.addAttribute("view", "view/process");
+        ViewHelper.setView(model, "view/process", "Java Process Manager");
         return "layout"; // Load layout.html
     }
 

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
@@ -28,7 +29,7 @@ public class VideoController {
     // Trang HTML phát video
     @GetMapping("/video")
     public String videoPage(Model model) {
-        model.addAttribute("view", "view/video-player");
+        ViewHelper.setView(model, "view/video-player", "Video Player");
         return "layout"; // Load layout.html
     }
 

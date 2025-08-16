@@ -90,9 +90,7 @@
         </div>
     </div>
 
-    <script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-
         function showConfirmation(element) {
             const url = element.getAttribute("data-url");
             showConfirm("Bạn có chắc chắn muốn xoá ghi chú này không?", () => {
@@ -100,8 +98,6 @@
             });
         }
 
-
-        const toast = new bootstrap.Toast(document.getElementById("autosaveToast"));
         const forms = document.querySelectorAll(".noteForm");
 
         forms.forEach(form => {

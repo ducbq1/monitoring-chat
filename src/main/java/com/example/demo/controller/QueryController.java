@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -13,10 +14,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/query")
 public class QueryController {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    // ✅ Hàm lấy danh sách bảng từ H2 database
+    public QueryController(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     private List<String> getH2TableNames() {
         try {
             return jdbcTemplate.queryForList(
@@ -36,8 +39,8 @@ public class QueryController {
         model.addAttribute("rowCount", 0);
         model.addAttribute("executionTimeMs", 0);
         model.addAttribute("error", null);
-        model.addAttribute("tables", getH2TableNames()); // ✅ Gửi danh sách bảng qua view
-        model.addAttribute("view", "view/query");
+        model.addAttribute("tables", getH2TableNames());
+        ViewHelper.setView(model, "view/query", "SQL Playground");
         return "layout"; // Load layout.html
     }
 
@@ -68,8 +71,8 @@ public class QueryController {
             model.addAttribute("executionTimeMs", 0);
         }
 
-        model.addAttribute("tables", getH2TableNames()); // ✅ Đảm bảo gửi lại danh sách bảng sau POST
-        model.addAttribute("view", "view/query");
+        model.addAttribute("tables", getH2TableNames());
+        ViewHelper.setView(model, "view/query", "SQL Playground");
         return "layout"; // Load layout.html
     }
 }

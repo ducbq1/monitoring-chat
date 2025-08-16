@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.FeignLog;
 import com.example.demo.repository.FeignLogRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +43,7 @@ public class FeignLogController {
 
         model.addAttribute("logPage", logPage);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("view", "view/feign-logs");
+        ViewHelper.setView(model, "view/feign-logs", "Feign Logs");
         return "layout"; // Load layout.html
     }
 

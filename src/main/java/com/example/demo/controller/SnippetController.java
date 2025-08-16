@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.Snippet;
 import com.example.demo.repository.SnippetRepo;
 import org.springframework.data.domain.Sort;
@@ -24,7 +25,7 @@ public class SnippetController {
         List<Snippet> snippets = repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
         snippets.forEach(Snippet::prepareTagList); // Tách tagList
         model.addAttribute("snippetList", snippets);
-        model.addAttribute("view", "view/snippet");
+        ViewHelper.setView(model, "view/snippet", "Code Snippet Manager");
         return "layout"; // Load layout.html
     }
 

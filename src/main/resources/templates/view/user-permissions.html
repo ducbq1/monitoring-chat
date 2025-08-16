@@ -1,36 +1,34 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
 <head>
-    <meta charset="UTF-8"/>
-    <title>User Management - Permission Matrix</title>
     <style>
-        body { font-family: ui-sans-serif, system-ui, -apple-system; margin: 0; }
-        header { padding: 16px; border-bottom: 1px solid #eee; }
-        .container { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 64px); }
-        .sidebar { border-right: 1px solid #eee; padding: 12px; overflow: auto; }
-        .content { padding: 16px; overflow: auto; }
-        .user-item { padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; }
-        .user-item a { text-decoration: none; color: #111; display: block; }
-        .user-item.active { background: #f0f7ff; border: 1px solid #cde3ff; }
-        .muted { color: #666; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th.sticky { position: sticky; top: 0; background: #fafafa; z-index: 2; }
-        td.left { text-align: left; }
-        .toolbar { display: flex; gap: 8px; align-items: center; }
-        .toolbar input[type="text"] { padding: 8px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
-        .btn { padding: 8px 12px; border: 1px solid #ccc; background: #fff; border-radius: 8px; cursor: pointer; }
-        .btn.primary { background: #2563eb; color: white; border-color: #2563eb; }
-        .card { border: 1px solid #eee; border-radius: 12px; padding: 16px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        body { font-family: ui-sans-serif, system-ui, -apple-system; margin:0; }
+        header { padding:16px; border-bottom:1px solid #eee; }
+        .container { display:grid; grid-template-columns:280px 1fr; height:calc(100vh - 210px); max-width:100vw; margin:auto; }
+        .sidebar { border:1px solid #eee; border-radius: 12px; padding:12px; overflow:auto; }
+        .content { padding:16px; overflow:auto; }
+        .user-item { padding:8px 10px; border-radius:8px; margin-bottom:6px; }
+        .user-item a { text-decoration:none; color:#111; display:block; }
+        .user-item.active { background:#f0f7ff; border:1px solid #cde3ff; }
+        .muted { color:#666; font-size:12px; }
+        table { width:100%; border-collapse:collapse; margin-top:12px; }
+        th, td { border:1px solid #ddd; padding:8px; text-align:center; }
+        th.sticky { position:sticky; top:0; background:#fafafa; z-index:2; }
+        td.left { text-align:left; }
+        .toolbar { display:flex; gap:8px; align-items:center; }
+        .toolbar input[type="text"] { padding:8px; border:1px solid #ddd; border-radius:8px; width:100%; }
+        .btn { padding:8px 12px; border:1px solid #ccc; background:#fff; border-radius:8px; cursor:pointer; }
+        .btn.primary { background:#2563eb; color:white; border-color:#2563eb; }
+        .card { border:1px solid #eee; border-radius:12px; padding:16px; }
+        .grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:12px; }
+        .sticky-col { position:sticky; left:0; background:#fff; z-index:1; }
     </style>
 </head>
 <body>
 <header>
-    <div class="toolbar" style="max-width: 1100px; margin: 0 auto;">
+    <div class="toolbar" style="max-width:1100px; margin:0 auto;">
         <form th:action="@{/admin/users}" method="get" style="display:flex; gap:8px; flex:1;">
-            <input type="text" name="q" placeholder="Tìm user theo tên/email..."
-                   th:value="${q}"/>
+            <input type="text" name="q" placeholder="Tìm user theo tên/email/username..." th:value="${q}"/>
             <button class="btn">Search</button>
         </form>
     </div>
@@ -38,45 +36,51 @@
 
 <div class="container">
     <!-- LEFT: user list -->
-    <aside class="sidebar">
+    <aside class="sidebar" style="overflow-y:auto; max-height: calc(100vh - 64px);">
         <div th:each="u : ${users}"
              th:classappend="${selectedUser != null and u.id == selectedUser.id} ? ' user-item active' : ' user-item'">
             <a th:href="@{/admin/users(userId=${u.id}, q=${q})}">
-                <div><strong th:text="${u.name}">Alice</strong></div>
-                <div class="muted" th:text="${u.email}">alice@example.com</div>
+                <div><strong th:text="${u.fullName}">Alice</strong></div>
+                <div class="muted" th:text="${u.email != null ? u.email : u.username}">alice@example.com</div>
+                <div class="muted" th:text="${u.username}">alice</div>
             </a>
         </div>
         <div th:if="${#lists.isEmpty(users)}" class="muted">Không có user nào.</div>
     </aside>
 
     <!-- RIGHT: details + permissions -->
-    <main class="content">
+    <main class="content" style="display:flex; flex-direction:column; overflow:hidden;">
         <div th:if="${selectedUser == null}" class="muted">Chọn 1 user để quản lý quyền.</div>
 
-        <div th:if="${selectedUser != null}" class="card" style="max-width: 1100px;">
-            <h2 style="margin-top:0;" th:text="'User: ' + ${selectedUser.name}">User: Alice</h2>
+        <div th:if="${selectedUser != null}" class="card" style="flex:1; display:flex; flex-direction:column; max-width:1100px; overflow:hidden;">
+            <h2 style="margin-top:0;" th:text="'User: ' + ${selectedUser.fullName}">User: Alice</h2>
+
             <div class="grid">
-                <div><strong>Email:</strong> <span th:text="${selectedUser.email}">alice@example.com</span></div>
+                <div><strong>Email:</strong> <span th:text="${selectedUser.email != null ? selectedUser.email : '-'}">alice@example.com</span></div>
+                <div><strong>Username:</strong> <span th:text="${selectedUser.username}">alice</span></div>
                 <div><strong>ID:</strong> <span th:text="${selectedUser.id}">1</span></div>
             </div>
 
-            <form th:action="@{/admin/users/permissions}" method="post" style="margin-top:16px;">
+            <form th:action="@{/admin/users/permissions}" method="post"
+                  style="margin-top:16px; display:flex; flex-direction:column; height: calc(100% - 100px);">
                 <input type="hidden" name="userId" th:value="${selectedUser.id}"/>
                 <input type="hidden" name="q" th:value="${q}"/>
 
-                <div style="overflow:auto; max-height: 60vh;">
-                    <table>
+                <!-- scrollable wrapper -->
+                <div style="overflow:auto; flex:1; height:0;">
+                    <table style="width:100%; border-collapse:collapse;">
                         <thead>
                         <tr>
-                            <th class="sticky" style="left:0; text-align:left;">Resource</th>
-                            <th class="sticky" th:each="a : ${actions}" th:text="${a}">VIEW</th>
+                            <th class="sticky sticky-col" style="top:0; left:0; background:#fafafa; z-index:3; text-align:left;">Resource</th>
+                            <th th:each="a : ${actions}" class="sticky" style="top:0; background:#fafafa; z-index:2;" th:text="${a}">VIEW</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="r : ${resources}">
-                            <td class="left" style="position: sticky; left:0; background:#fff;">
+                            <td class="left sticky-col" style="background:#fff; z-index:1;">
                                 <div><strong th:text="${r.name}">Dashboard</strong></div>
                                 <div class="muted" th:text="'#' + ${r.id} + ' • ' + ${r.type}">#101 • PAGE</div>
+                                <div class="muted" th:text="${r.url}">/dashboard</div>
                             </td>
                             <td th:each="a : ${actions}">
                                 <input type="checkbox" name="grants"
@@ -89,12 +93,13 @@
                 </div>
 
                 <div style="margin-top:12px; display:flex; gap:8px;">
-                    <button class="btn">Cancel</button>
+                    <a th:href="@{/admin/users(userId=${selectedUser.id}, q=${q})}" class="btn">Cancel</a>
                     <button class="btn primary" type="submit">Save changes</button>
                 </div>
             </form>
         </div>
     </main>
 </div>
+
 </body>
 </html>

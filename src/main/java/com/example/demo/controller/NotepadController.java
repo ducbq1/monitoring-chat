@@ -15,8 +15,11 @@ import java.util.List;
 @RequestMapping("/notepad")
 public class NotepadController {
 
-    @Autowired
-    private NoteRepository noteRepo;
+    private final NoteRepository noteRepo;
+
+    public NotepadController(NoteRepository noteRepo) {
+        this.noteRepo = noteRepo;
+    }
 
     @PostMapping("/save")
     public ResponseEntity<?> saveNote(@RequestBody Note note) {

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.Comment;
 import com.example.demo.model.Task;
 import com.example.demo.model.TaskColumn;
@@ -44,7 +45,7 @@ public class TaskController {
         }
 
         model.addAttribute("columns", columns);
-        model.addAttribute("view", "view/task-board");
+        ViewHelper.setView(model, "view/task-board", "Task Manager");
         return "layout";
     }
 
@@ -57,7 +58,7 @@ public class TaskController {
         }
         model.addAttribute("task", task);
         model.addAttribute("users", userService.findAllByManagerIsNull());
-        model.addAttribute("view", "view/task-detail");
+        ViewHelper.setView(model, "view/task-detail", "Task Detail");
         return "layout";
     }
 
@@ -103,7 +104,7 @@ public class TaskController {
         model.addAttribute("task", task);
         model.addAttribute("users", users);
         model.addAttribute("comments", comments);
-        model.addAttribute("view", "view/task-detail");
+        ViewHelper.setView(model, "view/task-detail", "Task Detail");
         return "layout";
     }
 

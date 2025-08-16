@@ -82,26 +82,26 @@ public class HomeController {
         );
 
         model.addAttribute("treeData", treeData);
-        ViewHelper.setView(model, "view/tree", "\uD83C\uDF33 Tree View with Details");
+        ViewHelper.setView(model, "view/tree", "Tree View with Details");
         return "layout"; // Load layout.html
     }
 
 
     @GetMapping("/architecture")
     public String showArchitecturePage(Model model) {
-        model.addAttribute("view", "view/architecture");
+        ViewHelper.setView(model, "view/architecture", "System Architecture");
         return "layout"; // Load layout.html
     }
 
     @GetMapping("/users")
     public String showUsers(Model model) {
-        model.addAttribute("view", "view/users");
+        ViewHelper.setView(model, "view/users", "Settings & Users");
         return "layout"; // Load layout.html
     }
 
     @GetMapping("/settings")
     public String showSettings(Model model) {
-        model.addAttribute("view", "view/settings");
+        ViewHelper.setView(model, "view/settings", "Users Management");
         return "layout"; // Load layout.html
     }
 
@@ -112,7 +112,7 @@ public class HomeController {
         model.addAttribute("note", currentNote);
         model.addAttribute("noteList", allNotes);
         model.addAttribute("activeId", currentNote.getId());
-        model.addAttribute("view", "view/note");
+        ViewHelper.setView(model, "view/note", " Insight Notepad");
         return "layout"; // Load layout.html
     }
 
@@ -143,7 +143,7 @@ public class HomeController {
 //        healthService.checkAll();
         Page<UrlStatus> urlPage = repo.findAll(PageRequest.of(page, size));
         model.addAttribute("urlPage", urlPage);
-        model.addAttribute("view", "view/dashboard");
+        ViewHelper.setView(model, "view/dashboard", "Dashboard");
         return "layout"; // Load layout.html
     }
 
@@ -153,7 +153,7 @@ public class HomeController {
                           @RequestParam(defaultValue = "6") int size) {
         Page<UrlStatus> urlPage = repo.findAll(PageRequest.of(page, size));
         model.addAttribute("urlPage", urlPage);
-        model.addAttribute("view", "view/raw");
+        ViewHelper.setView(model, "view/raw", " Raw URL Status");
         return "layout"; // Load layout.html
     }
 }

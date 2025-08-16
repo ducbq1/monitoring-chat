@@ -21,6 +21,6 @@ public class AuthService {
     }
 
     public boolean hasRole(User user, String role) {
-        return user.getRoles() != null && Arrays.asList(user.getRoles().split(",")).contains(role);
+        return user.getRoles() != null && user.getRoles().contains(role);
     }
 }

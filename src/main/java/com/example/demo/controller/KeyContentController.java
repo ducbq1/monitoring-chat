@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.KeyContent;
 import com.example.demo.repository.KeyContentRepository;
 import org.apache.tomcat.util.file.ConfigurationSource;
@@ -43,7 +44,7 @@ public class KeyContentController {
     public String index(Model model) {
         List<KeyContent> dataList = repository.findAll();
         model.addAttribute("dataList", dataList);
-        model.addAttribute("view", "view/content-store");
+        ViewHelper.setView(model, "view/content-store", "Content Store");
         return "layout"; // Load layout.html
     }
 
@@ -74,7 +75,7 @@ public class KeyContentController {
     public String search(@RequestParam("key") String key, Model model) {
         List<KeyContent> dataList = repository.findByStorageKeyContainingIgnoreCase(key);
         model.addAttribute("dataList", dataList);
-        model.addAttribute("view", "view/content-store");
+        ViewHelper.setView(model, "view/content-store", "Content Store");
         return "layout"; // Load layout.html
     }
 
@@ -120,7 +121,7 @@ public class KeyContentController {
     public String editForm(@PathVariable Long id, Model model) {
         KeyContent data = repository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
         model.addAttribute("data", data);
-        model.addAttribute("view", "view/content-store-edit");
+        ViewHelper.setView(model, "view/content-store-edit", "Content Store");
         return "layout"; // Load layout.html
     }
 

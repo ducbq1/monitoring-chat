@@ -11,8 +11,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
+
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     public List<Task> findByStatusAndParentTaskIsNull(String status) {
         return taskRepository.findByStatusAndParentTaskIsNull(status);

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -24,7 +25,7 @@ public class UserController {
         }
         User freshUser = userRepository.findById(user.getId()).orElse(user);
         model.addAttribute("user", freshUser);
-        model.addAttribute("view", "view/user-info");
+        ViewHelper.setView(model, "view/user-info", "User Information");
         return "layout";
     }
 }
