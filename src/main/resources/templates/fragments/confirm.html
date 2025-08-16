@@ -1,0 +1,86 @@
+<div th:fragment="confirm">
+    <!-- Modal chung -->
+    <div class="modal fade" id="appModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appModalTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="appModalMessage"></div>
+                <div class="modal-footer" id="appModalFooter"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // render modal
+        function showModal({title, message, buttons = []}) {
+            document.getElementById("appModalTitle").innerText = title;
+            document.getElementById("appModalMessage").innerHTML = message;
+
+            const footer = document.getElementById("appModalFooter");
+            footer.innerHTML = ""; // clear buttons
+
+            buttons.forEach(btn => {
+                const b = document.createElement("button");
+                b.className = "btn " + (btn.class || "btn-secondary");
+                b.innerText = btn.text;
+                if (btn.dismiss) b.setAttribute("data-bs-dismiss", "modal");
+                b.onclick = () => {
+                    if (btn.onClick) btn.onClick();
+                };
+                footer.appendChild(b);
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById("appModal"));
+            modal.show();
+        }
+
+        // confirm
+        function showConfirm(message, onOk, onCancel) {
+            showModal({
+                title: "Xác nhận",
+                message: message,
+                buttons: [
+                    { text: "Hủy", class: "btn-secondary", dismiss: true, onClick: onCancel },
+                    { text: "Đồng ý", class: "btn-danger", dismiss: true, onClick: onOk }
+                ]
+            });
+        }
+
+        // info
+        function showInfo(message, onOk) {
+            showModal({
+                title: "Thông báo",
+                message: message,
+                buttons: [
+                    { text: "OK", class: "btn-primary", dismiss: true, onClick: onOk }
+                ]
+            });
+        }
+
+        // error
+        function showError(message, onOk) {
+            showModal({
+                title: "Lỗi",
+                message: `<span class="text-danger">${message}</span>`,
+                buttons: [
+                    { text: "Đóng", class: "btn-danger", dismiss: true, onClick: onOk }
+                ]
+            });
+        }
+
+        // success
+        function showSuccess(message, onOk) {
+            showModal({
+                title: "Thành công",
+                message: `<span class="text-success">${message}</span>`,
+                buttons: [
+                    { text: "OK", class: "btn-success", dismiss: true, onClick: onOk }
+                ]
+            });
+        }
+    </script>
+
+</div>

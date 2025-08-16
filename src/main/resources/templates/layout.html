@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title id="page-title">Insight Monitor</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/bootstrap-icons-1.10.5/font/bootstrap-icons.css" rel="stylesheet"></head>
+<head th:replace="fragments/common :: common-head"></head>
 <style>
+
     .nav-link {
         transition: background-color 0.3s ease, color 0.3s ease;
         border-radius: 0.375rem;
@@ -53,26 +49,7 @@
     }
 </style>
 <script>
-    function showToast(message, isError = false) {
-        const toastEl = document.getElementById('custom-toast');
-        const toastBody = document.getElementById('toast-message');
 
-        toastBody.innerText = message;
-
-        if (isError) {
-            // Màu đỏ than đậm (đẹp và không chói)
-            toastEl.style.backgroundColor = '#e2777f';
-            toastEl.style.color = '#d1e7ff';
-        } else {
-            // Màu xanh navy xám đậm (rất dễ nhìn)
-            toastEl.style.backgroundColor = '#3293dc';
-            toastEl.style.color = '#d1e7ff';
-        }
-
-        // Hiển thị toast
-        const toast = new bootstrap.Toast(toastEl);
-        toast.show();
-    }
 </script>
 <body class="d-flex">
 
@@ -125,56 +102,7 @@
     </div>
 </div>
 
-<!-- Toast Container -->
-<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
-    <div id="custom-toast" class="toast align-items-center text-white border-0" role="alert"
-         aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body" id="toast-message">
-                <!-- Nội dung toast sẽ được cập nhật ở đây -->
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-
-<script src="/webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
-<script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
-<script src="/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    function showGlobalSpinner() {
-        const sidebarSpinner = document.getElementById("sidebar-loading");
-        if (sidebarSpinner) sidebarSpinner.classList.remove("d-none");
-    }
-
-    function hideGlobalSpinner() {
-        const sidebarSpinner = document.getElementById("sidebar-loading");
-        if (sidebarSpinner) sidebarSpinner.classList.add("d-none");
-    }
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const allForms = document.querySelectorAll('form');
-        allForms.forEach(form => {
-            form.addEventListener('submit', () => {
-                showGlobalSpinner();
-            });
-        });
-
-        const navLinks = document.querySelectorAll('a.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function (e) {
-                const href = link.getAttribute('href');
-                if (href && !href.startsWith('#') && !href.startsWith('javascript')) {
-                    showGlobalSpinner();
-                }
-            });
-        });
-    });
-
-</script>
+<div th:replace="fragments/common :: common-scripts"></div>
 
 </body>
 </html>

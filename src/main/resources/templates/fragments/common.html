@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="common-head">
+    <meta charset="UTF-8">
+    <title id="page-title">Insight Monitor</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/bootstrap-icons-1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body th:fragment="common-scripts">
+
+<!-- Bootstrap JS + dependencies -->
+<script src="/webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+
+<!-- Toast element đặt ẩn sẵn -->
+<div id="custom-toast"
+     class="toast position-fixed top-0 end-0 m-3 p-0 border rounded-2 shadow-lg"
+     role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false"
+     style="min-width: 320px; min-height: 80px;">
+    <div class="d-flex flex-row align-items-start p-3">
+        <!-- Icon -->
+        <div class="me-3">
+            <i id="toast-icon" class="fa-solid fa-circle-info fa-2x text-primary"></i>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-grow-1">
+            <div class="fw-bold" id="toast-title">Thông báo</div>
+            <div id="toast-message" class="small text-muted">Nội dung message ở đây...</div>
+        </div>
+
+        <!-- Clear button -->
+        <div>
+            <button type="button" class="btn-close btn-close-black me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/confirm :: confirm"></div>
+
+<!-- JS helper chung -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const allForms = document.querySelectorAll('form');
+        allForms.forEach(form => {
+            form.addEventListener('submit', () => {
+                showGlobalSpinner();
+            });
+        });
+
+        const navLinks = document.querySelectorAll('a.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.startsWith('javascript')) {
+                    showGlobalSpinner();
+                }
+            });
+        });
+    });
+
+    function showToast(message, type) {
+        if (type) {
+            emitToast("error", "Cảnh báo", message)
+        } else {
+            emitToast("success", "Thông báo", message)
+        }
+    }
+
+    function emitToast(type, title, message, timeout = 3000) {
+        const toastEl = document.getElementById("custom-toast");
+        const toastTitle = document.getElementById("toast-title");
+        const toastMessage = document.getElementById("toast-message");
+        const toastIcon = document.getElementById("toast-icon");
+
+        // Update content
+        toastTitle.textContent = title;
+        toastMessage.textContent = message;
+
+        // Update icon theo loại
+        if (type === "success") {
+            toastIcon.className = "bi bi-check-circle-fill fs-4 text-success me-2";
+        } else if (type === "error") {
+            toastIcon.className = "bi bi-x-circle-fill fs-4 text-danger me-2";
+        } else {
+            toastIcon.className = "bi bi-info-circle-fill fs-4 text-primary me-2";
+        }
+
+        // Show toast
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+
+        setTimeout(() => {
+            toast.hide();
+        }, timeout);
+    }
+
+    function clearToast() {
+        const toastEl = document.getElementById("custom-toast");
+        const toast = bootstrap.Toast.getInstance(toastEl);
+        if (toast) toast.hide();
+    }
+
+    async function fetchWithError(url, options = {}) {
+        try {
+            const res = await fetch(url, options);
+            if (!res.ok) {
+                const text = await res.text();
+                showToast("Error: " + text, true);
+                throw new Error(text);
+            }
+            return res.json();
+        } catch (err) {
+            showToast("Network error", true);
+            throw err;
+        }
+    }
+
+    function showGlobalSpinner() {
+        const sidebarSpinner = document.getElementById("sidebar-loading");
+        if (sidebarSpinner) sidebarSpinner.classList.remove("d-none");
+    }
+
+    function hideGlobalSpinner() {
+        const sidebarSpinner = document.getElementById("sidebar-loading");
+        if (sidebarSpinner) sidebarSpinner.classList.add("d-none");
+    }
+</script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const errorMessage = /*[[${error}]]*/ null;
+    const successMessage = /*[[${success}]]*/ null;
+
+    if (errorMessage) {
+        showToast(errorMessage, true);
+    }
+    if (successMessage) {
+        showToast(successMessage, false);
+    }
+    /*]]>*/
+</script>
+
+</body>
+</html>

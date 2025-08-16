@@ -8,7 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Controller
@@ -21,22 +24,25 @@ public class LoginController {
     }
 
     @GetMapping("/login")
-    public String loginForm(HttpSession session) {
+    public String loginPage(@RequestParam(value = "redirect", required = false) String redirect, Model model, HttpSession session) {
         if (session != null && session.getAttribute("user") != null) {
-            return "redirect:/dashboard";
+            String target = safeRedirect(redirect);
+            return "redirect:" + (target != null ? target : "/dashboard");
         }
         return "view/login";
     }
 
     @PostMapping("/login")
-    public String loginSubmit(@RequestParam String accessKey, HttpSession session, Model model) {
+    public String loginSubmit(@RequestParam String accessKey, @RequestParam(required = false) String redirect, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Optional<User> userOpt = authService.authenticate(accessKey);
         if (userOpt.isPresent()) {
             session.setAttribute("user", userOpt.get()); // Lưu user vào session
-            return "redirect:/dashboard";
+            String target = safeRedirect(redirect);
+            return "redirect:" + (target != null ? target : "/dashboard");
         } else {
-            model.addAttribute("error", "❌ Invalid access key");
-            return "view/login";
+            redirectAttributes.addFlashAttribute("redirect", redirect);
+            redirectAttributes.addFlashAttribute("error", "Invalid access key");
+            return "redirect:/login";
         }
     }
 
@@ -44,5 +50,13 @@ public class LoginController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    private String safeRedirect(String redirect) {
+        if (redirect == null || redirect.isBlank()) return null;
+        String dec = URLDecoder.decode(redirect, StandardCharsets.UTF_8);
+        if (dec.startsWith("http://") || dec.startsWith("https://")) return null;
+        if (!dec.startsWith("/")) return null;
+        return dec;
     }
 }
