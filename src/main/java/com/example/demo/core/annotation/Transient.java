@@ -1,9 +1,9 @@
-package com.example.demo.infradb.annotation;
+package com.example.demo.core.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Column {
+public @interface Transient {
     String name();
 }

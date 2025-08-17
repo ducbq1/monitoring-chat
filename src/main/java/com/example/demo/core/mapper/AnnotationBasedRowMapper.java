@@ -1,6 +1,6 @@
-package com.example.demo.infradb.mapper;
+package com.example.demo.core.mapper;
 
-import com.example.demo.infradb.annotation.Column;
+import com.example.demo.core.annotation.Column;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.lang.reflect.Field;

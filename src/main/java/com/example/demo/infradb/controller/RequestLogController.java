@@ -19,19 +19,16 @@ public class RequestLogController {
 
     // Lấy tất cả logs
     @GetMapping
-    public ResponseEntity<List<RequestLog>> getAllLogs(
-            @RequestParam String dbName
-    ) {
-        return ResponseEntity.ok(service.getAllLogs(dbName));
+    public ResponseEntity<List<RequestLog>> getAllLogs() {
+        return ResponseEntity.ok(service.findAll());
     }
 
     // Lấy log theo ID
     @GetMapping("/{id}")
     public ResponseEntity<RequestLog> getLogById(
-            @RequestParam String dbName,
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(service.getLogById(dbName, id));
+        return ResponseEntity.ok(service.findById(id));
     }
 
     // Tạo log mới
@@ -40,29 +37,27 @@ public class RequestLogController {
             @RequestParam String dbName,
             @RequestBody RequestLog log
     ) {
-        service.createLog(dbName, log);
+        service.insert(log);
         return ResponseEntity.ok().build();
     }
 
     // Cập nhật log
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLog(
-            @RequestParam String dbName,
             @PathVariable Long id,
             @RequestBody RequestLog log
     ) {
         log.setId(id); // đảm bảo id đúng
-        service.updateLog(dbName, log);
+        service.update(log);
         return ResponseEntity.ok().build();
     }
 
     // Xóa log
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLog(
-            @RequestParam String dbName,
             @PathVariable Long id
     ) {
-        service.deleteLog(dbName, id);
+        service.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }

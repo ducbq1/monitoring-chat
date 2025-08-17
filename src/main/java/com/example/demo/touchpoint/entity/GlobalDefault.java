@@ -1,15 +1,18 @@
 package com.example.demo.touchpoint.entity;
 
-import com.example.demo.touchpoint.annotation.Column;
-import com.example.demo.touchpoint.annotation.Table;
+import com.example.demo.core.annotation.Column;
+import com.example.demo.core.annotation.DataSource;
+import com.example.demo.core.annotation.Table;
+import com.example.demo.core.entity.BaseEntity;
 
+@DataSource(name = "postgres")
 @Table(name = "global_defaults")
-public class GlobalDefault {
+public class GlobalDefault extends BaseEntity {
 
-    @Column(name = "name")
+    @Column(name = "name", title = "Tên khóa")
     private String name;
 
-    @Column(name = "value")
+    @Column(name = "value", title = "Giá trị")
     private String value;
 
     public GlobalDefault() {}

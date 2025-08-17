@@ -1,9 +1,9 @@
-package com.example.demo.touchpoint.annotation;
+package com.example.demo.core.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Column {
+public @interface Table {
     String name();
 }
