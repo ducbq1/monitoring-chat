@@ -1,8 +1,6 @@
 package com.example.demo.core.entity;
 
-import com.example.demo.core.annotation.Column;
-import com.example.demo.core.annotation.DataSource;
-import com.example.demo.core.annotation.Table;
+import com.example.demo.core.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +8,8 @@ import java.time.LocalDateTime;
 @Table(name = "bts_request_log", title = "Nhật ký thao tác")
 public class RequestLog extends BaseEntity {
 
+    @PrimaryKey
+    @GeneratedValue
     @Column(name = "id")
     private Long id;
 

@@ -14,13 +14,15 @@ public interface JdbcService<T extends BaseEntity> {
 
     int update(T entity);
 
-    T findById(Long id);
+    T findById(Object id);
 
-    T findByName(String name);
+    List<T> findByColumn(String columnName, Object value);
 
-    int deleteById(Long id);
+    List<T> findByColumns(Map<String, Object> conditions);
 
-    int deleteByName(String name);
+    int deleteById(Object id);
+
+    int deleteByColumn(String columnName, Object value);
 
     int count();
 }

@@ -2,12 +2,14 @@ package com.example.demo.core.entity;
 
 import com.example.demo.core.annotation.Column;
 import com.example.demo.core.annotation.DataSource;
+import com.example.demo.core.annotation.PrimaryKey;
 import com.example.demo.core.annotation.Table;
 
 @DataSource(name = "touchpoint")
 @Table(name = "global_defaults", title = "Cấu hình tham số")
 public class GlobalDefault extends BaseEntity {
 
+    @PrimaryKey
     @Column(name = "name", title = "Tên khóa")
     private String name;
 

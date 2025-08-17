@@ -1,8 +1,7 @@
 package com.example.demo.core.entity;
 
-import com.example.demo.core.annotation.Column;
-import com.example.demo.core.annotation.DataSource;
-import com.example.demo.core.annotation.Table;
+import com.example.demo.core.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +9,8 @@ import java.time.LocalDateTime;
 @Table(name = "url_status")
 public class UrlStatus extends BaseEntity {
 
+    @PrimaryKey
+    @GeneratedValue
     @Column(name = "id", title = "Khóa chính")
     private Long id;
 
@@ -31,12 +32,10 @@ public class UrlStatus extends BaseEntity {
     @Column(name = "response_time", title = "Thời gian phản hồi (ms)")
     private String responseTime;
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }

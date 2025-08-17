@@ -11,12 +11,12 @@ import com.example.demo.helper.ViewHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
 
 public abstract class BaseController<T extends BaseEntity> {
-    private final ServiceFactory serviceFactory;
     private final GenericService genericService;
     private final Class<T> entityClass;
     private final JdbcService<T> jdbcService;
@@ -25,7 +25,6 @@ public abstract class BaseController<T extends BaseEntity> {
     protected final String viewPrefix;
 
     protected BaseController(ServiceFactory serviceFactory, GenericService genericService, Class<T> entityClass, String basePath, String viewPrefix) {
-        this.serviceFactory = serviceFactory;
         this.genericService = genericService;
         this.entityClass = entityClass;
         this.basePath = basePath;
@@ -43,17 +42,17 @@ public abstract class BaseController<T extends BaseEntity> {
         List<T> records = jdbcService.paginate(page, size);
         List<Map<String, String>> columns = genericService.getColumns(entityClass);
 
-        TablePageDTO<T> dto = new TablePageDTO<>();
-        dto.setTableName(genericService.getTableTitle(entityClass));
-        dto.setColumns(columns);
-        dto.setRecords(records);
-        dto.setNumber(page);
-        dto.setSize(size);
-        dto.setTotalPages(totalPages);
-        dto.setTotalElements(totalElements);
-        dto.setNumberOfElements(records.size());
-        dto.setFirst(page == 0);
-        dto.setLast(page >= totalPages - 1);
+        TablePageDTO<T> dto = new TablePageDTO<T>()
+                .setTableName(genericService.getTableTitle(entityClass))
+                .setColumns(genericService.getColumns(entityClass))
+                .setRecords(records)
+                .setNumber(page)
+                .setSize(size)
+                .setTotalPages(totalPages)
+                .setTotalElements(totalElements)
+                .setNumberOfElements(Math.min(size, (int)(totalElements - page * size)))
+                .setFirst(page == 0)
+                .setLast(page >= totalPages - 1);
 
         model.addAttribute("table", dto);
         
@@ -67,6 +66,7 @@ public abstract class BaseController<T extends BaseEntity> {
         T record = genericService.create(entityClass);
         model.addAttribute("columns", columns);
         model.addAttribute("record", record);
+        model.addAttribute("listUri", basePath);
         model.addAttribute("requestUri", request.getRequestURI());
         ViewHelper.setView(model, viewPrefix + "/form", genericService.getTableTitle(entityClass));
         return "layout";
@@ -79,22 +79,25 @@ public abstract class BaseController<T extends BaseEntity> {
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, Model model) {
+    public String editForm(@PathVariable Object id, Model model, HttpServletRequest request) {
         T record = jdbcService.findById(id);
-        model.addAttribute("columns", genericService.getColumns(entityClass));
         model.addAttribute("record", record);
-        return "redirect:" + basePath;
+        model.addAttribute("columns", genericService.getColumns(entityClass));
+        model.addAttribute("listUri", basePath);
+        model.addAttribute("requestUri", request.getRequestURI());
+        ViewHelper.setView(model, "generic/form", genericService.getTableTitle(entityClass));
+        return "layout";
     }
 
     @PostMapping("/edit/{id}")
-    public String editSubmit(@PathVariable Long id, @ModelAttribute T record) {
-        record.setId(id);
+    public String editSubmit(@PathVariable Object id, @ModelAttribute T record) {
+        genericService.setPrimaryKeyValue(record, id);
         jdbcService.update(record);
         return "redirect:" + basePath;
     }
 
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Object id) {
         jdbcService.deleteById(id);
         return "redirect:" + basePath;
     }

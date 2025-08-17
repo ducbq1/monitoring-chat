@@ -41,6 +41,13 @@
             background-color: #e9ecef;
         }
 
+        .ant-table th:last-child,
+        .ant-table td:last-child {
+            width: 120px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
         .actions {
             display: flex;
             gap: 6px;
@@ -98,10 +105,10 @@
     </div>
 
     <div class="ant-table">
-        <table class="table table-bordered mb-0">
+        <table id="table-resize1" class="table table-bordered mb-0">
             <thead>
             <tr>
-                <th th:each="col : ${table.columns}" th:text="${col['name']}"></th>
+                <th th:each="col : ${table.columns}" th:text="${col['title']}"></th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -111,8 +118,8 @@
                     th:text="${@fieldUtil.get(record, col['field'])}"></td>
                 <td>
                     <div class="actions">
-                        <a th:href="@{${requestUri} + '/edit/' + ${record.id}}" class="btn btn-primary">Edit</a>
-                        <form th:action="@{${requestUri} + '/delete/' + ${record.id}}" method="post"
+                        <a th:href="@{${requestUri} + '/edit/' + ${@fieldUtil.getPrimaryKeyValue(record)}}" class="btn btn-primary">Edit</a>
+                        <form th:action="@{${requestUri} + '/delete/' + ${@fieldUtil.getPrimaryKeyValue(record)}}" method="post"
                               onsubmit="return confirm('Are you sure?');">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>

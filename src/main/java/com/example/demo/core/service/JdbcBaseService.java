@@ -1,8 +1,11 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.mapper.AnnotationBasedRowMapper;
 import com.example.demo.core.repository.JdbcRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +18,12 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
 
     @Override
     public List<T> findAll() {
-        return repository.findAll();
+        return reverseCopy(repository.findAll());
     }
 
     @Override
     public List<T> paginate(int page, int size) {
-        return repository.paginate(page, size);
+        return reverseCopy(repository.paginate(page, size));
     }
 
     @Override
@@ -34,27 +37,42 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     }
 
     @Override
-    public T findById(Long id) {
+    public T findById(Object id) {
         return repository.findById(id);
     }
 
     @Override
-    public T findByName(String name) {
-        return repository.findByName(name);
+    public List<T> findByColumn(String columnName, Object value) {
+        return repository.findByColumn(columnName, value);
     }
 
     @Override
-    public int deleteById(Long id) {
+    public List<T> findByColumns(Map<String, Object> conditions) {
+        return repository.findByColumns(conditions);
+    }
+
+    @Override
+    public int deleteById(Object id) {
         return repository.deleteById(id);
     }
 
     @Override
-    public int deleteByName(String name) {
-        return repository.deleteByName(name);
+    public int deleteByColumn(String columnName, Object value) {
+        return repository.deleteByColumn(columnName, value);
     }
 
     @Override
     public int count() {
         return repository.count();
     }
+
+    private List<T> reverseCopy(List<T> original) {
+        int size = original.size();
+        List<T> reversed = new ArrayList<>(size);
+        for (int i = size - 1; i >= 0; i--) {
+            reversed.add(original.get(i));
+        }
+        return reversed;
+    }
+
 }

@@ -1,17 +1,27 @@
 package com.example.demo.core.service;
 
-import com.example.demo.core.annotation.Column;
-import com.example.demo.core.annotation.DataSource;
-import com.example.demo.core.annotation.Table;
-import com.example.demo.core.annotation.Transient;
+import com.example.demo.core.annotation.*;
+import com.example.demo.helper.FieldUtil;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class GenericServiceImpl implements GenericService {
+
+    private final FieldUtil fieldUtil;
+
+    public GenericServiceImpl(FieldUtil fieldUtil) {
+        this.fieldUtil = fieldUtil;
+    }
+
+    public void setPrimaryKeyValue(Object entity, Object value) {
+        fieldUtil.setPrimaryKeyValue(entity, value);
+    }
 
     public <T> T create(Class<T> clazz) {
         T record = null;
@@ -56,7 +66,22 @@ public class GenericServiceImpl implements GenericService {
             Map<String,String> col = new HashMap<>();
             Column c = f.getAnnotation(Column.class);
             col.put("field", f.getName());
-            col.put("column", c != null ? c.title() : f.getName());
+            col.put("title", c != null && !c.title().isEmpty() ? c.title() : f.getName());
+            Class<?> type = f.getType();
+            if (type == Boolean.class || type == boolean.class) {
+                col.put("type", "boolean");
+            } else if (type == Integer.class || type == int.class
+                    || type == Long.class || type == long.class
+                    || type == Double.class || type == double.class
+                    || type == Float.class || type == float.class) {
+                col.put("type", "number");
+            } else if (type == LocalDate.class) {
+                col.put("type", "date");
+            } else if (type == LocalDateTime.class || type == Date.class) {
+                col.put("type", "datetime");
+            } else {
+                col.put("type", "text");
+            }
             cols.add(col);
         }
         return cols;
@@ -75,12 +100,13 @@ public class GenericServiceImpl implements GenericService {
     public <T> Object[] getFieldValues(T entity, boolean includeIdLast) throws IllegalAccessException {
         List<Object> values = new ArrayList<>();
         Field idField = null;
+        String primaryKey = getPrimaryKey(entity.getClass());
 
         for (Field field : entity.getClass().getDeclaredFields()) {
             Column colAnno = field.getAnnotation(Column.class);
             if (colAnno != null) {
                 field.setAccessible(true);
-                if ("id".equalsIgnoreCase(colAnno.name())) {
+                if (primaryKey.equalsIgnoreCase(colAnno.name())) {
                     idField = field;
                 } else {
                     values.add(field.get(entity));
@@ -92,4 +118,17 @@ public class GenericServiceImpl implements GenericService {
         }
         return values.toArray();
     }
+
+    public String getPrimaryKey(Class<?> clazz) {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(PrimaryKey.class)) {
+                Column colAnno = field.getAnnotation(Column.class);
+                return (colAnno != null && !colAnno.name().isBlank())
+                        ? colAnno.name()
+                        : field.getName();
+            }
+        }
+        throw new RuntimeException("No @PrimaryKey field found in " + clazz.getSimpleName());
+    }
+
 }

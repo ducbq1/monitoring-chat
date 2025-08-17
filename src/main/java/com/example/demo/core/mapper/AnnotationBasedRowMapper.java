@@ -23,7 +23,7 @@ public record AnnotationBasedRowMapper<T>(Class<T> type) implements RowMapper<T>
                 if (colAnno != null && colAnno.name() != null && !colAnno.name().isBlank()) {
                     colName = colAnno.name();
                 } else {
-                    colName = field.getName(); // fallback sang tên field
+                    colName = field.getName();
                 }
 
                 field.setAccessible(true);

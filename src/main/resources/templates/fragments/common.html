@@ -7,6 +7,7 @@
     <link href="/css/select2.min.css" rel="stylesheet">
     <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="/bootstrap-icons-1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
 </head>
 
 <body th:fragment="common-scripts">
@@ -18,6 +19,7 @@
 <script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="/js/select2.min.js"></script>
 <script src="/js/prism.min.js"></script>
+<script src="/js/colResizable-1.6.min.js"></script>
 
 <!-- Toast element đặt ẩn sẵn -->
 <div id="custom-toast"
@@ -38,7 +40,8 @@
 
         <!-- Clear button -->
         <div>
-            <button type="button" class="btn-close btn-close-black me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-black me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -146,6 +149,19 @@
         showToast(successMessage, false);
     }
     /*]]>*/
+</script>
+
+<script>
+    $(function () {
+        $("#table-resize").colResizable({
+            liveDrag: true,
+            gripInnerHtml: "<div class='grip'></div>",
+            draggingClass: "dragging",
+            resizeMode: 'fit',
+            postbackSafe: false,
+            partialRefresh: false
+        });
+    });
 </script>
 
 </body>

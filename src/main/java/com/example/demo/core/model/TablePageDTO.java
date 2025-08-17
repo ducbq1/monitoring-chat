@@ -19,79 +19,89 @@ public class TablePageDTO<T> {
         return tableName;
     }
 
-    public void setTableName(String tableName) {
+    public TablePageDTO<T> setTableName(String tableName) {
         this.tableName = tableName;
+        return this;
     }
 
     public List<Map<String, String>> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<Map<String, String>> columns) {
+    public TablePageDTO<T> setColumns(List<Map<String, String>> columns) {
         this.columns = columns;
+        return this;
     }
 
     public List<T> getRecords() {
         return records;
     }
 
-    public void setRecords(List<T> records) {
+    public TablePageDTO<T> setRecords(List<T> records) {
         this.records = records;
+        return this;
     }
 
     public int getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public TablePageDTO<T> setNumber(int number) {
         this.number = number;
+        return this;
     }
 
     public int getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public TablePageDTO<T> setSize(int size) {
         this.size = size;
+        return this;
     }
 
     public int getTotalPages() {
         return totalPages;
     }
 
-    public void setTotalPages(int totalPages) {
+    public TablePageDTO<T> setTotalPages(int totalPages) {
         this.totalPages = totalPages;
+        return this;
     }
 
     public long getTotalElements() {
         return totalElements;
     }
 
-    public void setTotalElements(long totalElements) {
+    public TablePageDTO<T> setTotalElements(long totalElements) {
         this.totalElements = totalElements;
+        return this;
     }
 
     public boolean isFirst() {
         return first;
     }
 
-    public void setFirst(boolean first) {
+    public TablePageDTO<T> setFirst(boolean first) {
         this.first = first;
+        return this;
     }
 
     public boolean isLast() {
         return last;
     }
 
-    public void setLast(boolean last) {
+    public TablePageDTO<T> setLast(boolean last) {
         this.last = last;
+        return this;
     }
 
     public int getNumberOfElements() {
         return numberOfElements;
     }
 
-    public void setNumberOfElements(int numberOfElements) {
+    public TablePageDTO<T> setNumberOfElements(int numberOfElements) {
         this.numberOfElements = numberOfElements;
+        return this;
     }
 }

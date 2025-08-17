@@ -3,14 +3,80 @@
 <head>
     <title th:text="'Form - ' + ${#strings.capitalize(requestUri)}">Form</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        form { display: flex; flex-direction: column; gap: 12px; max-width: 400px; }
-        label { font-weight: bold; }
-        input, select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 100%; }
-        .btn { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; }
-        .btn-primary { background: #28a745; color: #fff; }
-        .btn-secondary { background: #6c757d; color: #fff; }
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1677ff;
+            margin-bottom: 16px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 0.75rem;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: capitalize;
+        }
+
+        input, select {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.35rem;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 0.35rem;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #1677ff;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+
+        .btn + .btn {
+            margin-left: 8px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            margin-top: 12px;
+        }
     </style>
+
 </head>
 <body>
 <h2>Form</h2>
@@ -18,15 +84,30 @@
 <form th:action="@{${requestUri}}" method="post"
       th:object="${record}">
     <div th:each="col : ${columns}">
-        <label th:for="${col['field']}" th:text="${col['name']}"></label>
-        <input type="text" th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+        <label th:for="${col['field']}" th:text="${col['title']}"></label>
+        <div th:switch="${col['type']}">
+            <input th:case="'datetime'" type="datetime-local"
+                   th:name="${col['field']}" th:id="${col['field']}"
+                   th:value="${#temporals.format(record[col['field']], 'yyyy-MM-dd''T''HH:mm')}"/>
+
+            <input th:case="'date'" type="date"
+                   th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+
+            <input th:case="'number'" type="number"
+                   th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+
+            <input th:case="'boolean'" type="checkbox"
+                   th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+
+            <input th:case="'text'" type="text" th:field="*{__${col['field']}__}"
+                   th:id="${col['field']}"/>
+        </div>
+
     </div>
 
     <div style="display:flex; gap:8px;">
         <button type="submit" class="btn btn-primary">Save</button>
-        <div th:with="baseUri=${#strings.substring(requestUri,0,requestUri.lastIndexOf('/'))}">
-            <a th:href="@{${baseUri}}" class="btn btn-secondary">Cancel</a>
-        </div>
+        <a th:href="${listUri}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 
