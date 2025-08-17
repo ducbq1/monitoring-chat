@@ -1,12 +1,11 @@
-package com.example.demo.touchpoint.entity;
+package com.example.demo.core.entity;
 
 import com.example.demo.core.annotation.Column;
 import com.example.demo.core.annotation.DataSource;
 import com.example.demo.core.annotation.Table;
-import com.example.demo.core.entity.BaseEntity;
 
-@DataSource(name = "postgres")
-@Table(name = "global_defaults")
+@DataSource(name = "touchpoint")
+@Table(name = "global_defaults", title = "Cấu hình tham số")
 public class GlobalDefault extends BaseEntity {
 
     @Column(name = "name", title = "Tên khóa")

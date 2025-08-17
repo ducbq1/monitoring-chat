@@ -17,18 +17,24 @@ public record AnnotationBasedRowMapper<T>(Class<T> type) implements RowMapper<T>
             T instance = type.getDeclaredConstructor().newInstance();
 
             for (Field field : type.getDeclaredFields()) {
+                String colName = null;
                 Column colAnno = field.getAnnotation(Column.class);
-                if (colAnno != null) {
-                    String colName = colAnno.name();
-                    field.setAccessible(true);
-                    Object value = rs.getObject(colName);
 
-                    if (value instanceof Timestamp timestamp && field.getType().equals(LocalDateTime.class)) {
-                        value = timestamp.toLocalDateTime();
-                    }
-
-                    field.set(instance, value);
+                if (colAnno != null && colAnno.name() != null && !colAnno.name().isBlank()) {
+                    colName = colAnno.name();
+                } else {
+                    colName = field.getName(); // fallback sang tên field
                 }
+
+                field.setAccessible(true);
+
+                Object value = rs.getObject(colName);
+
+                if (value instanceof Timestamp timestamp && field.getType().equals(LocalDateTime.class)) {
+                    value = timestamp.toLocalDateTime();
+                }
+
+                field.set(instance, value);
             }
 
             return instance;

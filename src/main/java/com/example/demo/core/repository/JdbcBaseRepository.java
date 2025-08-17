@@ -2,16 +2,17 @@ package com.example.demo.core.repository;
 
 import com.example.demo.config.DynamicDataSourceConfig;
 import com.example.demo.core.annotation.Column;
-import com.example.demo.core.annotation.DataSource;
-import com.example.demo.core.annotation.Table;
 import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.mapper.AnnotationBasedRowMapper;
+import com.example.demo.core.mapper.PagedRowMapper;
 import com.example.demo.core.service.GenericService;
-import com.example.demo.infradb.entity.RequestLog;
+import com.example.demo.core.service.GenericServiceImpl;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRepository<T> {
@@ -29,6 +30,13 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     public List<T> findAll() {
         String sql = "SELECT * FROM " + getTableName();
         return jdbcTemplate().query(sql, new AnnotationBasedRowMapper<>(entityClass));
+    }
+
+    @Override
+    public List<T> paginate(int offset, int limit) {
+        String sql = "SELECT * FROM " + getTableName();
+        return jdbcTemplate().query(sql, new PagedRowMapper<>(new AnnotationBasedRowMapper<>(entityClass), offset, limit))
+                .stream().filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -97,23 +105,17 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
         return jdbcTemplate().update(sql, name);
     }
 
-    private String getTableName() {
-        Table table = entityClass.getAnnotation(Table.class);
-        if (table != null && !table.name().isEmpty()) {
-            return table.name();
-        }
-        return entityClass.getSimpleName().toLowerCase();
+    @Override
+    public int count() {
+        String sql = "SELECT COUNT(*) FROM " + getTableName();
+        return jdbcTemplate().queryForObject(sql, Integer.class);
     }
 
-    private String getDataSource() {
-        DataSource dataSource = entityClass.getAnnotation(DataSource.class);
-        if (dataSource != null && !dataSource.name().isEmpty()) {
-            return dataSource.name();
-        }
-        return "h2";
+    private String getTableName() {
+        return genericService.getTableName(entityClass);
     }
 
     private JdbcTemplate jdbcTemplate() {
-        return dynamicDataSourceConfig.getJdbcTemplate(getDataSource());
+        return dynamicDataSourceConfig.getJdbcTemplate(genericService.getDataSource(entityClass));
     }
 }

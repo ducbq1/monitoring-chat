@@ -10,7 +10,12 @@ custom:
       username: oracle_user
       password: secret
       driver-class-name: oracle.jdbc.OracleDriver
-    postgres:
+    infrastructure:
+      url: jdbc:postgresql://localhost:5432/mydb
+      username: myuser
+      password: mypassword
+      driver-class-name: org.postgresql.Driver
+    touchpoint:
       url: jdbc:postgresql://localhost:5432/mydb
       username: myuser
       password: mypassword
@@ -20,7 +25,7 @@ custom:
       username:
       password:
       driver-class-name: org.apache.derby.iapi.jdbc.AutoloadedDriver
-    fis:
+    profile:
       url: protocol=jdbc:fisglobal|database=ip
       username: user
       password: pass

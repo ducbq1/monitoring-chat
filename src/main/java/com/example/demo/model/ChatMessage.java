@@ -5,8 +5,6 @@ public class ChatMessage {
     private String content;
     private String room;
 
-    // Getters và setters
-
     public String getSender() {
         return sender;
     }

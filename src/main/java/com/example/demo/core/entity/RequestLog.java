@@ -1,14 +1,13 @@
-package com.example.demo.infradb.entity;
+package com.example.demo.core.entity;
 
 import com.example.demo.core.annotation.Column;
 import com.example.demo.core.annotation.DataSource;
 import com.example.demo.core.annotation.Table;
-import com.example.demo.core.entity.BaseEntity;
 
 import java.time.LocalDateTime;
 
-@DataSource(name = "postgres")
-@Table(name = "bts_request_log")
+@DataSource(name = "h2")
+@Table(name = "bts_request_log", title = "Nhật ký thao tác")
 public class RequestLog extends BaseEntity {
 
     @Column(name = "id")

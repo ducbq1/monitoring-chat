@@ -1,11 +1,10 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.repository.JdbcBaseRepository;
 import com.example.demo.core.repository.JdbcRepository;
-import com.example.demo.infradb.entity.RequestLog;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcService<T> {
     private final JdbcRepository<T> repository;
@@ -17,6 +16,11 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     @Override
     public List<T> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<T> paginate(int page, int size) {
+        return repository.paginate(page, size);
     }
 
     @Override
@@ -47,5 +51,10 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     @Override
     public int deleteByName(String name) {
         return repository.deleteByName(name);
+    }
+
+    @Override
+    public int count() {
+        return repository.count();
     }
 }

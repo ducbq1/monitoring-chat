@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<head>
+    <title th:text="${table.tableName} + ' List'">Entity List</title>
+    <style>
+        .ant-table {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .ant-table thead {
+            background-color: #1677ff;
+            color: #fff;
+        }
+
+        .ant-table th {
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            color: white;
+            background-color: cornflowerblue;
+            text-transform: capitalize;
+        }
+
+        .ant-table td {
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        .ant-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .ant-table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 4px 10px;
+            border-radius: 0.35rem;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #1677ff;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1677ff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .pagination-container {
+            background-color: #f8f9fa;
+            border-radius: 0 0 0.75rem 0.75rem;
+            padding: 10px;
+        }
+
+        .pagination .page-link {
+            border-radius: 0.375rem !important;
+            margin: 0 4px;
+            font-size: 0.875rem;
+            padding: 0.35rem 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<section class="container-fluid mt-4">
+    <div class="section-title" th:text="${table.tableName} + ' List'">Entity List</div>
+
+    <div style="margin-bottom:12px;">
+        <a th:href="@{${requestUri} + '/create'}" class="btn btn-primary">+ Create New</a>
+    </div>
+
+    <div class="ant-table">
+        <table class="table table-bordered mb-0">
+            <thead>
+            <tr>
+                <th th:each="col : ${table.columns}" th:text="${col['name']}"></th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${table.records}">
+                <td th:each="col : ${table.columns}"
+                    th:text="${@fieldUtil.get(record, col['field'])}"></td>
+                <td>
+                    <div class="actions">
+                        <a th:href="@{${requestUri} + '/edit/' + ${record.id}}" class="btn btn-primary">Edit</a>
+                        <form th:action="@{${requestUri} + '/delete/' + ${record.id}}" method="post"
+                              onsubmit="return confirm('Are you sure?');">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination-container d-flex justify-content-between align-items-center p-2 border-top bg-light rounded-bottom">
+
+            <!-- Nút phân trang bên trái -->
+            <nav th:if="${table.totalPages > 1}">
+                <ul class="pagination mb-0">
+                    <li class="page-item" th:classappend="${table.first}? 'disabled'">
+                        <a class="page-link" th:href="@{${requestUri}(page=${table.number - 1}, size=${table.size})}">Trước</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, table.totalPages - 1)}"
+                        th:classappend="${table.number == i}? 'active'">
+                        <a class="page-link" th:href="@{${requestUri}(page=${i}, size=${table.size})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${table.last}? 'disabled'">
+                        <a class="page-link" th:href="@{${requestUri}(page=${table.number + 1}, size=${table.size})}">Tiếp</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Phần bên phải: số bản ghi + dropdown chọn size -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <div class="text-muted small">
+                    Hiển thị từ
+                    <span th:text="${table.number * table.size + 1}"></span>
+                    đến
+                    <span th:text="${table.number * table.size + table.numberOfElements}"></span>
+                    của
+                    <span th:text="${table.totalElements}"></span> bản ghi
+                </div>
+
+                <!-- Dropdown chọn số bản ghi mỗi trang -->
+                <form th:action="@{${requestUri}}" method="get">
+                    <input type="hidden" name="page" value="0"/>
+                    <select name="size" class="form-select form-select-sm"
+                            onchange="this.form.submit()">
+                        <option th:value="5" th:selected="${table.size == 5}">5 / trang</option>
+                        <option th:value="10" th:selected="${table.size == 10}">10 / trang</option>
+                        <option th:value="20" th:selected="${table.size == 20}">20 / trang</option>
+                        <option th:value="50" th:selected="${table.size == 50}">50 / trang</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
