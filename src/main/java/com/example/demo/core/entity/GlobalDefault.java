@@ -1,12 +1,10 @@
 package com.example.demo.core.entity;
 
-import com.example.demo.core.annotation.Column;
-import com.example.demo.core.annotation.DataSource;
-import com.example.demo.core.annotation.PrimaryKey;
-import com.example.demo.core.annotation.Table;
+import com.example.demo.core.annotation.*;
 
+@Metadata(menu = "Cấu hình tham số", title = "Cấu hình tham số")
 @DataSource(name = "touchpoint")
-@Table(name = "global_defaults", title = "Cấu hình tham số")
+@Table(name = "global_defaults")
 public class GlobalDefault extends BaseEntity {
 
     @PrimaryKey

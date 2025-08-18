@@ -1,7 +1,7 @@
 package com.example.demo.core.repository;
 
+import com.example.demo.core.annotation.Table;
 import com.example.demo.core.entity.BaseEntity;
-import jakarta.persistence.Table;
 import org.reflections.Reflections;
 
 import java.util.Collections;

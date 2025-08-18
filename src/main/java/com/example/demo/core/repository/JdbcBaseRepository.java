@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRepository<T> {
     private final Class<T> entityClass;
@@ -31,15 +32,45 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
 
     @Override
     public List<T> findAll() {
-        String sql = "SELECT * FROM " + tableName;
+        List<String> columns = genericService.getColumns(entityClass, true);
+        String columnList = String.join(", ", columns);
+        String sql = "SELECT " + columnList + " FROM " + tableName + " ORDER BY " + primaryKey;
         return jdbcTemplate().query(sql, new AnnotationBasedRowMapper<>(entityClass));
     }
 
     @Override
     public List<T> paginate(int page, int limit) {
-        String sql = "SELECT * FROM " + tableName;
+        List<String> columns = genericService.getColumns(entityClass, true);
+        String columnList = String.join(", ", columns);
+        String sql = "SELECT " + columnList + " FROM " + tableName + " ORDER BY " + primaryKey;
         return jdbcTemplate().query(sql, new PagedRowMapper<>(new AnnotationBasedRowMapper<>(entityClass), page * limit, limit))
                 .stream().filter(Objects::nonNull).toList();
+    }
+
+    @Override
+    public List<T> paginate(int page, int limit, Map<String, Object> filters) {
+        List<String> columns = genericService.getColumns(entityClass, true);
+        String columnList = String.join(", ", columns);
+
+        StringBuilder sql = new StringBuilder("SELECT " + columnList + " FROM " + tableName);
+
+        // Build WHERE clause từ filters
+        List<Object> params = new ArrayList<>();
+        if (filters != null && !filters.isEmpty()) {
+            sql.append(" WHERE ");
+            sql.append(filters.keySet().stream()
+                    .map(key -> key + " = ?")
+                    .collect(Collectors.joining(" AND ")));
+            params.addAll(filters.values());
+        }
+
+        sql.append(" ORDER BY ").append(primaryKey);
+
+        return jdbcTemplate().query(
+                sql.toString(),
+                params.toArray(),
+                new PagedRowMapper<>(new AnnotationBasedRowMapper<>(entityClass), page * limit, limit)
+        ).stream().filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -137,7 +168,24 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
         String sql = "SELECT COUNT(*) FROM " + tableName;
         return jdbcTemplate().queryForObject(sql, Integer.class);
     }
-    
+
+    @Override
+    public int count(Map<String, Object> filters) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM " + tableName);
+
+        List<Object> params = new ArrayList<>();
+        if (filters != null && !filters.isEmpty()) {
+            sql.append(" WHERE ");
+            sql.append(filters.keySet().stream()
+                    .map(key -> key + " = ?")
+                    .collect(Collectors.joining(" AND ")));
+            params.addAll(filters.values());
+        }
+
+        return jdbcTemplate().queryForObject(sql.toString(), params.toArray(), Integer.class);
+    }
+
+
     private JdbcTemplate jdbcTemplate() {
         return dynamicDataSourceConfig.getJdbcTemplate(dataSource);
     }

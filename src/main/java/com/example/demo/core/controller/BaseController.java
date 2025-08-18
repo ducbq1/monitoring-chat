@@ -2,6 +2,7 @@ package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.entity.GlobalDefault;
+import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
 import com.example.demo.core.repository.RepositoryFactory;
 import com.example.demo.core.service.GenericService;
@@ -40,10 +41,11 @@ public abstract class BaseController<T extends BaseEntity> {
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         List<T> records = jdbcService.paginate(page, size);
-        List<Map<String, String>> columns = genericService.getColumns(entityClass);
+        List<Map<String, Object>> columns = genericService.getColumns(entityClass);
+        MetaDataDTO metadata = genericService.getMetadata(entityClass);
 
         TablePageDTO<T> dto = new TablePageDTO<T>()
-                .setTableName(genericService.getTableTitle(entityClass))
+                .setMetadata(metadata)
                 .setColumns(genericService.getColumns(entityClass))
                 .setRecords(records)
                 .setNumber(page)
@@ -56,19 +58,20 @@ public abstract class BaseController<T extends BaseEntity> {
 
         model.addAttribute("table", dto);
         
-        ViewHelper.setView(model, viewPrefix + "/list", dto.getTableName());
+        ViewHelper.setView(model, viewPrefix + "/list", metadata.getTitle());
         return "layout";
     }
 
     @GetMapping("/create")
     public String createForm(Model model, HttpServletRequest request) {
-        List<Map<String, String>> columns = genericService.getColumns(entityClass);
+        MetaDataDTO metadata = genericService.getMetadata(entityClass);
+        List<Map<String, Object>> columns = genericService.getColumns(entityClass);
         T record = genericService.create(entityClass);
         model.addAttribute("columns", columns);
         model.addAttribute("record", record);
         model.addAttribute("listUri", basePath);
         model.addAttribute("requestUri", request.getRequestURI());
-        ViewHelper.setView(model, viewPrefix + "/form", genericService.getTableTitle(entityClass));
+        ViewHelper.setView(model, viewPrefix + "/form", metadata.getTitle());
         return "layout";
     }
 
@@ -80,12 +83,13 @@ public abstract class BaseController<T extends BaseEntity> {
 
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Object id, Model model, HttpServletRequest request) {
+        MetaDataDTO metadata = genericService.getMetadata(entityClass);
         T record = jdbcService.findById(id);
         model.addAttribute("record", record);
         model.addAttribute("columns", genericService.getColumns(entityClass));
         model.addAttribute("listUri", basePath);
         model.addAttribute("requestUri", request.getRequestURI());
-        ViewHelper.setView(model, "generic/form", genericService.getTableTitle(entityClass));
+        ViewHelper.setView(model, "generic/form", metadata.getTitle());
         return "layout";
     }
 

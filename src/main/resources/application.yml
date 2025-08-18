@@ -1,5 +1,10 @@
 custom:
   multi-databases:
+    authentication:
+      password: root
+      driver-class-name: oracle.jdbc.OracleDriver
+      username: fundamental_authentication
+      url: jdbc:oracle:thin:@localhost:1521:xe
     h2:
       url: jdbc:h2:file:./data/chatdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
       username: sa

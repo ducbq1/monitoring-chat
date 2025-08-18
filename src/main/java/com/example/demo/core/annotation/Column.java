@@ -8,4 +8,6 @@ public @interface Column {
     String name();
     String title() default "";
     int length() default -1;
+    boolean readonly() default false;
+    boolean required() default false;
 }

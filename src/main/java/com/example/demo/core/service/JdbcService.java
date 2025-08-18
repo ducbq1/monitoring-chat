@@ -10,6 +10,8 @@ public interface JdbcService<T extends BaseEntity> {
 
     List<T> findAll();
 
+    List<T> paginate(int page, int size, Map<String, Object> filters);
+
     int insert(T entity);
 
     int update(T entity);
@@ -25,4 +27,6 @@ public interface JdbcService<T extends BaseEntity> {
     int deleteByColumn(String columnName, Object value);
 
     int count();
+
+    int count(Map<String, Object> filters);
 }

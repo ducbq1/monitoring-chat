@@ -1,11 +1,8 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.mapper.AnnotationBasedRowMapper;
 import com.example.demo.core.repository.JdbcRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,12 +15,17 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
 
     @Override
     public List<T> findAll() {
-        return reverseCopy(repository.findAll());
+        return repository.findAll();
     }
 
     @Override
     public List<T> paginate(int page, int size) {
-        return reverseCopy(repository.paginate(page, size));
+        return repository.paginate(page, size);
+    }
+
+    @Override
+    public List<T> paginate(int page, int size, Map<String, Object> filters) {
+        return repository.paginate(page, size, filters);
     }
 
     @Override
@@ -66,13 +68,8 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
         return repository.count();
     }
 
-    private List<T> reverseCopy(List<T> original) {
-        int size = original.size();
-        List<T> reversed = new ArrayList<>(size);
-        for (int i = size - 1; i >= 0; i--) {
-            reversed.add(original.get(i));
-        }
-        return reversed;
+    @Override
+    public int count(Map<String, Object> filters) {
+        return repository.count(filters);
     }
-
 }

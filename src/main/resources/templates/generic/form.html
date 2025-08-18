@@ -5,7 +5,6 @@
     <style>
         body {
             font-family: ui-sans-serif, system-ui, -apple-system;
-            margin: 20px;
             background-color: #f8f9fa;
         }
 
@@ -88,19 +87,31 @@
         <div th:switch="${col['type']}">
             <input th:case="'datetime'" type="datetime-local"
                    th:name="${col['field']}" th:id="${col['field']}"
-                   th:value="${#temporals.format(record[col['field']], 'yyyy-MM-dd''T''HH:mm')}"/>
+                   th:value="${#temporals.format(record[col['field']], 'yyyy-MM-dd''T''HH:mm')}"
+                   th:readonly="${col['readonly']}"
+                   th:required="${col['required']}" />
 
             <input th:case="'date'" type="date"
-                   th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+                   th:name="${col['field']}" th:id="${col['field']}"
+                   th:value="${#temporals.format(record[col['field']], 'yyyy-MM-dd')}"
+                   th:readonly="${col['readonly']}"
+                   th:required="${col['required']}" />
 
             <input th:case="'number'" type="number"
-                   th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+                   th:field="*{__${col['field']}__}" th:id="${col['field']}"
+                   th:readonly="${col['readonly']}"
+                   th:required="${col['required']}" />
 
             <input th:case="'boolean'" type="checkbox"
-                   th:field="*{__${col['field']}__}" th:id="${col['field']}"/>
+                   th:field="*{__${col['field']}__}" th:id="${col['field']}"
+                   th:disabled="${col['readonly']}"
+                   th:required="${col['required']}" />
 
-            <input th:case="'text'" type="text" th:field="*{__${col['field']}__}"
-                   th:id="${col['field']}"/>
+            <input th:case="'text'" type="text"
+                   th:field="*{__${col['field']}__}" th:id="${col['field']}"
+                   th:readonly="${col['readonly']}"
+                   th:required="${col['required']}" />
+
         </div>
 
     </div>

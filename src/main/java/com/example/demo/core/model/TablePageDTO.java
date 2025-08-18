@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TablePageDTO<T> {
-    private String tableName;
-    private List<Map<String, String>> columns;
+    private MetaDataDTO metadata;
+    private List<Map<String, Object>> columns;
     private List<T> records;
     private int number;
     private int size;
@@ -15,20 +15,20 @@ public class TablePageDTO<T> {
     private boolean first;
     private boolean last;
 
-    public String getTableName() {
-        return tableName;
+    public MetaDataDTO getMetadata() {
+        return metadata;
     }
 
-    public TablePageDTO<T> setTableName(String tableName) {
-        this.tableName = tableName;
+    public TablePageDTO<T> setMetadata(MetaDataDTO metadata) {
+        this.metadata = metadata;
         return this;
     }
 
-    public List<Map<String, String>> getColumns() {
+    public List<Map<String, Object>> getColumns() {
         return columns;
     }
 
-    public TablePageDTO<T> setColumns(List<Map<String, String>> columns) {
+    public TablePageDTO<T> setColumns(List<Map<String, Object>> columns) {
         this.columns = columns;
         return this;
     }

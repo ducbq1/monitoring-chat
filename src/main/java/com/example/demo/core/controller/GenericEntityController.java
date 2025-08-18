@@ -2,6 +2,7 @@ package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.entity.GlobalDefault;
+import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
 import com.example.demo.core.repository.EntityRegistry;
 import com.example.demo.core.repository.RepositoryFactory;
@@ -21,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,19 +43,30 @@ public class GenericEntityController {
     public String list(Model model,
                        @PathVariable String entity,
                        @RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "5") int size) {
+                       @RequestParam(defaultValue = "5") int size,
+                       HttpServletRequest request) {
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
+        MetaDataDTO metadata = genericService.getMetadata(clazz);
+
+        Map<String, String[]> rawParams = request.getParameterMap();
+        Map<String, String> filters = new HashMap<>();
+
+        rawParams.forEach((key, value) -> {
+            if (!"page".equals(key) && !"size".equals(key) && value != null && value.length > 0 && !value[0].isBlank()) {
+                filters.put(key, value[0].trim());
+            }
+        });
 
         JdbcService jdbcService = serviceFactory.getService(clazz);
-        long totalElements = jdbcService.count();
+        long totalElements = filters.isEmpty() ? jdbcService.count() : jdbcService.count(filters);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
-        List<BaseEntity> records = jdbcService.paginate(page, size);
-        List<Map<String, String>> columns = genericService.getColumns(clazz);
+        List<BaseEntity> records = filters.isEmpty() ? jdbcService.paginate(page, size) :  jdbcService.paginate(page, size, filters);
+        List<Map<String, Object>> columns = genericService.getColumns(clazz);
 
         TablePageDTO<BaseEntity> dto = new TablePageDTO<BaseEntity>()
-                .setTableName(genericService.getTableTitle(clazz))
+                .setMetadata(metadata)
                 .setColumns(columns)
                 .setRecords(records)
                 .setNumber(page)
@@ -64,8 +77,15 @@ public class GenericEntityController {
                 .setFirst(page == 0)
                 .setLast(page >= totalPages - 1);
 
+
+        int start = Math.max(0, page - 3);
+        int end = Math.min(totalPages - 1, page + 3);
+
+        model.addAttribute("params", filters);
+        model.addAttribute("pageStart", start);
+        model.addAttribute("pageEnd", end);
         model.addAttribute("table", dto);
-        ViewHelper.setView(model, "generic/list", dto.getTableName());
+        ViewHelper.setView(model, "generic/list", metadata.getTitle());
         return "layout";
     }
 
@@ -76,6 +96,7 @@ public class GenericEntityController {
                        HttpServletRequest request) {
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
+        MetaDataDTO metadata = genericService.getMetadata(clazz);
 
         JdbcService jdbcService = serviceFactory.getService(clazz);
         BaseEntity record = (id != null) ? jdbcService.findById(id) : genericService.create(clazz);
@@ -87,7 +108,7 @@ public class GenericEntityController {
         model.addAttribute("record", record);
         model.addAttribute("columns", genericService.getColumns(clazz));
         model.addAttribute("requestUri", request.getRequestURI());
-        ViewHelper.setView(model, "generic/form", genericService.getTableTitle(clazz));
+        ViewHelper.setView(model, "generic/form", metadata.getTitle());
         return "layout";
     }
 

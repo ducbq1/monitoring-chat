@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @DataSource(name = "infrastructure")
 @Table(name = "bts_request_log")
-public class Log extends BaseEntity {
+public class Log {
 
     @PrimaryKey
     @GeneratedValue

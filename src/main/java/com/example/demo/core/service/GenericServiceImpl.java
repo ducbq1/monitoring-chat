@@ -1,7 +1,9 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.annotation.*;
+import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.helper.FieldUtil;
+import com.example.demo.helper.MetadataValidator;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -33,12 +35,8 @@ public class GenericServiceImpl implements GenericService {
         return record;
     }
 
-    public String getTableTitle(Class<?> clazz) {
-        Table table = clazz.getAnnotation(Table.class);
-        if (table != null && !table.title().isEmpty()) {
-            return table.title();
-        }
-        return clazz.getSimpleName().toLowerCase();
+    public MetaDataDTO getMetadata(Class<?> clazz) {
+        return MetadataValidator.extractMetaData(clazz);
     }
 
     public String getTableName(Class<?> clazz) {
@@ -58,15 +56,18 @@ public class GenericServiceImpl implements GenericService {
     }
 
 
-    public List<Map<String,String>> getColumns(Class<?> clazz) {
+    public List<Map<String,Object>> getColumns(Class<?> clazz) {
         Field[] fields = clazz.getDeclaredFields();
-        List<Map<String,String>> cols = new ArrayList<>();
+        List<Map<String,Object>> cols = new ArrayList<>();
         for(Field f : fields){
             if(f.isAnnotationPresent(Transient.class)) continue;
-            Map<String,String> col = new HashMap<>();
+            Map<String,Object> col = new HashMap<>();
             Column c = f.getAnnotation(Column.class);
+            col.put("column", c != null && !c.name().isBlank() ? c.name() : f.getName());
             col.put("field", f.getName());
             col.put("title", c != null && !c.title().isEmpty() ? c.title() : f.getName());
+            col.put("required", c != null && c.required());
+            col.put("readonly", c != null && c.readonly());
             Class<?> type = f.getType();
             if (type == Boolean.class || type == boolean.class) {
                 col.put("type", "boolean");
@@ -95,6 +96,23 @@ public class GenericServiceImpl implements GenericService {
         } catch (Exception e){
             return null;
         }
+    }
+
+    public List<String> getColumns(Class<?> clazz, boolean includeId) {
+        List<String> columns = new ArrayList<>();
+        String primaryKey = getPrimaryKey(clazz);
+
+        for (Field field : clazz.getDeclaredFields()) {
+            Column colAnno = field.getAnnotation(Column.class);
+            if (colAnno != null) {
+                if (!includeId && primaryKey.equalsIgnoreCase(colAnno.name())) {
+                    continue;
+                }
+                columns.add(colAnno.name());
+            }
+        }
+
+        return columns;
     }
 
     public <T> Object[] getFieldValues(T entity, boolean includeIdLast) throws IllegalAccessException {
