@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>500 - Lỗi hệ thống</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}">
-</head>
+<head th:replace="~{fragments/common :: common-head(pageTitle='500 - Lỗi hệ thống')}"></head>
 <body class="bg-light text-center d-flex flex-column justify-content-center align-items-center" style="height: 100vh;">
 <img src="https://cdn-icons-png.flaticon.com/512/1828/1828848.png" width="120" alt="500 Icon">
 <h1 class="display-4 text-danger mt-3">500</h1>
 <p class="lead text-muted">Đã có lỗi xảy ra từ phía hệ thống 😵</p>
 <a th:href="@{/}" class="btn btn-outline-secondary mt-3">🧯 Quay lại</a>
+<div th:replace="fragments/common :: common-scripts"></div>
 </body>
 </html>
