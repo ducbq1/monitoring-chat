@@ -11,124 +11,69 @@ public class RequestLog extends BaseEntity {
 
     @PrimaryKey
     @GeneratedValue
-    @Column(name = "id")
+    @Column(name = "id", title = "ID")
     private Long id;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", title = "Ngày tạo")
     private LocalDateTime createdAt;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", title = "Người tạo")
     private String createdBy;
 
-    @Column(name = "curl_pmh")
+    @Column(name = "curl_pmh", title = "Curl PMH")
     private String curlPmh;
 
-    @Column(name = "duration_ms")
+    @Column(name = "duration_ms", title = "Thời gian (ms)")
     private Long durationMs;
 
-    @Column(name = "method")
+    @Column(name = "method", title = "Phương thức")
     private String method;
 
-    @Column(name = "request_body")
+    @Column(name = "request_body", title = "Nội dung yêu cầu")
     private String requestBody;
 
-    @Column(name = "request_id")
+    @Column(name = "request_id", title = "ID yêu cầu")
     private String requestId;
 
-    @Column(name = "response_body")
+    @Column(name = "response_body", title = "Nội dung phản hồi")
     private String responseBody;
 
-    @Column(name = "traceparent")
+    @Column(name = "traceparent", title = "Traceparent")
     private String traceparent;
 
-    @Column(name = "url")
+    @Column(name = "url", title = "URL")
     private String url;
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getCurlPmh() { return curlPmh; }
+    public void setCurlPmh(String curlPmh) { this.curlPmh = curlPmh; }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
+    public Long getDurationMs() { return durationMs; }
+    public void setDurationMs(Long durationMs) { this.durationMs = durationMs; }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
+    public String getMethod() { return method; }
+    public void setMethod(String method) { this.method = method; }
 
-    public String getCurlPmh() {
-        return curlPmh;
-    }
+    public String getRequestBody() { return requestBody; }
+    public void setRequestBody(String requestBody) { this.requestBody = requestBody; }
 
-    public void setCurlPmh(String curlPmh) {
-        this.curlPmh = curlPmh;
-    }
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 
-    public Long getDurationMs() {
-        return durationMs;
-    }
+    public String getResponseBody() { return responseBody; }
+    public void setResponseBody(String responseBody) { this.responseBody = responseBody; }
 
-    public void setDurationMs(Long durationMs) {
-        this.durationMs = durationMs;
-    }
+    public String getTraceparent() { return traceparent; }
+    public void setTraceparent(String traceparent) { this.traceparent = traceparent; }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public String getRequestBody() {
-        return requestBody;
-    }
-
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    public String getResponseBody() {
-        return responseBody;
-    }
-
-    public void setResponseBody(String responseBody) {
-        this.responseBody = responseBody;
-    }
-
-    public String getTraceparent() {
-        return traceparent;
-    }
-
-    public void setTraceparent(String traceparent) {
-        this.traceparent = traceparent;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+    public String getUrl() { return url; }
+    public void setUrl(String url) { this.url = url; }
 }

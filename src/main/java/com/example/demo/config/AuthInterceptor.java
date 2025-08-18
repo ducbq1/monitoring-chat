@@ -11,10 +11,20 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
+
+    private final ServerProperties serverProperties;
+
+    public AuthInterceptor(ServerProperties serverProperties) {
+        this.serverProperties = serverProperties;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String uri = request.getRequestURI();
         if (isPublicPath(uri)) return true;
+        if (serverProperties.getApplication().getOrDefault("authenticated", "false").equals("false")) {
+            return true;
+        }
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {

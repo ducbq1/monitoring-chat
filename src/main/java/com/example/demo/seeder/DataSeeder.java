@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -32,52 +34,63 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        Resource dashboard = resourceRepo.save(new Resource("Dashboard", "PAGE", "/dashboard"));
-        Resource report = resourceRepo.save(new Resource("Report", "PAGE", "/reports"));
-        Resource apiUser = resourceRepo.save(new Resource("User API", "API", "/api/users"));
-        Resource apiTask = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask1 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask2 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask3 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask4 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask5 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask6 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
-        Resource apiTask7 = resourceRepo.save(new Resource("Task API", "API", "/api/tasks"));
+        List<Resource> resources = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            resources.add(resourceRepo.save(new Resource("Page " + i, "PAGE", "/page/" + i)));
+        }
+        for (int i = 1; i <= 10; i++) {
+            resources.add(resourceRepo.save(new Resource("API User " + i, "API", "/api/users/" + i)));
+        }
+        for (int i = 1; i <= 10; i++) {
+            resources.add(resourceRepo.save(new Resource("API Task " + i, "API", "/api/tasks/" + i)));
+        }
 
-        Permission viewDashboard = new Permission("VIEW_DASHBOARD", "View dashboard page");
-        viewDashboard.getResources().add(dashboard);
+        Permission perm1 = new Permission("VIEW_DASHBOARD", "View dashboard page");
+        perm1.getResources().add(resources.get(0));
 
-        Permission manageReports = new Permission("MANAGE_REPORTS", "Full access to reports");
-        manageReports.getResources().add(report);
+        Permission perm2 = new Permission("MANAGE_REPORTS", "Full access to reports");
+        perm2.getResources().add(resources.get(1));
 
-        Permission manageUsers = new Permission("MANAGE_USERS", "CRUD users");
-        manageUsers.getResources().add(apiUser);
+        Permission perm3 = new Permission("MANAGE_USERS", "CRUD users");
+        perm3.getResources().addAll(resources.subList(10, 15));
 
-        Permission manageTasks = new Permission("MANAGE_TASKS", "CRUD tasks");
-        manageTasks.getResources().add(apiTask);
-        manageTasks.getResources().add(apiTask1);
-        manageTasks.getResources().add(apiTask2);
-        manageTasks.getResources().add(apiTask3);
-        manageTasks.getResources().add(apiTask4);
-        manageTasks.getResources().add(apiTask5);
-        manageTasks.getResources().add(apiTask6);
-        manageTasks.getResources().add(apiTask7);
+        Permission perm4 = new Permission("MANAGE_TASKS", "CRUD tasks");
+        perm4.getResources().addAll(resources.subList(20, 30));
 
-        permissionRepo.save(viewDashboard);
-        permissionRepo.save(manageReports);
-        permissionRepo.save(manageUsers);
-        permissionRepo.save(manageTasks);
+        Permission perm5 = new Permission("VIEW_ANALYTICS", "View analytics page");
+        perm5.getResources().add(resources.get(2));
+
+        Permission perm6 = new Permission("EXPORT_REPORTS", "Export report data");
+        perm6.getResources().add(resources.get(3));
+
+        Permission perm7 = new Permission("IMPORT_USERS", "Import users data");
+        perm7.getResources().add(resources.get(11));
+
+        Permission perm8 = new Permission("DELETE_TASKS", "Delete tasks");
+        perm8.getResources().add(resources.get(25));
+
+        Permission perm9 = new Permission("VIEW_SETTINGS", "View system settings");
+        perm9.getResources().add(resources.get(4));
+
+        Permission perm10 = new Permission("MANAGE_NOTIFICATIONS", "Manage notifications");
+        perm10.getResources().add(resources.get(5));
+
+        List<Permission> permissions = Arrays.asList(
+                perm1, perm2, perm3, perm4, perm5, perm6, perm7, perm8, perm9, perm10
+        );
+        permissionRepo.saveAll(permissions);
 
         Role ceo = new Role("CEO", "Chief Executive Officer");
-        ceo.getPermissions().add(viewDashboard);
-        ceo.getPermissions().add(manageReports);
-        ceo.getPermissions().add(manageUsers);
-        ceo.getPermissions().add(manageTasks);
+        Role admin = new Role("ADMIN", "Chief Executive Officer");
+        ceo.getPermissions().addAll(permissions);
+        roleRepo.save(admin);
         roleRepo.save(ceo);
 
-        User ceoUser = new User("ceo", "Trần CEO", null);
+        User ceoUser = new User("ducbq1", "Bùi Quang Đức", null);
+        ceoUser.getRoles().add(admin);
         ceoUser.getRoles().add(ceo);
-        ceoUser.setAccessKey("1111");
+        ceoUser.setAccessKey("111111");
+        ceoUser.setEmail("bq.duc@vietinbank.vn");
 
         User manager1 = new User("manager1", "Nguyễn Quản Lý 1", ceoUser);
         User manager2 = new User("manager2", "Phạm Quản Lý 2", ceoUser);

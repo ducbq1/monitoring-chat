@@ -53,6 +53,7 @@ chat:
 
 server:
   application:
+    authenticated: false
     name: InjectMapFromYAML
     url: http://injectmapfromyaml.dev
     description: How To Inject a map from a YAML File in Spring Boot
