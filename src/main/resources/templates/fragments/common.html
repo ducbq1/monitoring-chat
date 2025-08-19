@@ -25,26 +25,29 @@
 <div id="custom-toast"
      class="toast position-fixed top-0 end-0 m-3 p-0 border rounded-2 shadow-lg"
      role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false"
-     style="min-width: 320px; min-height: 80px;">
+     style="min-width: 320px; min-height: 80px; max-width: 400px;">
+
     <div class="d-flex flex-row align-items-start p-3">
-        <!-- Icon -->
         <div class="me-3">
             <i id="toast-icon" class="fa-solid fa-circle-info fa-2x text-primary"></i>
         </div>
 
-        <!-- Content -->
         <div class="flex-grow-1">
-            <div class="fw-bold" id="toast-title">Thông báo</div>
-            <div id="toast-message" class="small text-muted">Nội dung message ở đây...</div>
+            <div class="fw-bold text-wrap" id="toast-title" style="word-break: break-word;">
+                Thông báo rất dài có thể wrap xuống dòng nếu cần
+            </div>
+            <div id="toast-message" class="small text-muted text-wrap" style="word-break: break-word;">
+                Nội dung message rất dài có thể wrap xuống nhiều dòng nếu cần, không bị tràn ra ngoài.
+            </div>
         </div>
 
-        <!-- Clear button -->
         <div>
             <button type="button" class="btn-close btn-close-black me-2 m-auto" data-bs-dismiss="toast"
                     aria-label="Close"></button>
         </div>
     </div>
 </div>
+
 
 <div th:replace="fragments/confirm :: confirm"></div>
 
@@ -96,7 +99,7 @@
         }
     }
 
-    function emitToast(type, title, message, timeout = 3000) {
+    function emitToast(type, title, message, timeout = 100000) {
         const toastEl = document.getElementById("custom-toast");
         const toastTitle = document.getElementById("toast-title");
         const toastMessage = document.getElementById("toast-message");
@@ -158,15 +161,12 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const errorMessage = /*[[${error}]]*/ null;
-    const successMessage = /*[[${success}]]*/ null;
+    const message = /*[[${message}]]*/ null;
 
-    if (errorMessage) {
-        showToast(errorMessage, true);
+    if (message) {
+        emitToast(message.type, message.title, message.detail)
     }
-    if (successMessage) {
-        showToast(successMessage, false);
-    }
+
     /*]]>*/
 </script>
 

@@ -7,6 +7,7 @@ import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.mapper.AnnotationBasedRowMapper;
 import com.example.demo.core.mapper.PagedRowMapper;
 import com.example.demo.core.service.GenericService;
+import com.example.demo.exception.AppException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.lang.reflect.Field;
@@ -100,7 +101,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
             return jdbcTemplate().update(sql, values.toArray());
 
         } catch (Exception e) {
-            throw new RuntimeException("Error inserting " + tableName, e);
+            throw new AppException("Error inserting " + tableName, e);
         }
     }
 
@@ -119,7 +120,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
             return jdbcTemplate().update(sql, genericService.getFieldValues(entity, true));
 
         } catch (Exception e) {
-            throw new RuntimeException("Error updating " + tableName, e);
+            throw new AppException("Error updating " + tableName, e);
         }
     }
 

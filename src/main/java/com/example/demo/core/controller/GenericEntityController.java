@@ -2,10 +2,12 @@ package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.entity.GlobalDefault;
+import com.example.demo.core.model.MessageDTO;
 import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
 import com.example.demo.core.repository.EntityRegistry;
 import com.example.demo.core.repository.RepositoryFactory;
+import com.example.demo.core.repository.ViewContext;
 import com.example.demo.core.service.GenericService;
 import com.example.demo.core.service.JdbcService;
 import com.example.demo.core.service.ServiceFactory;
@@ -18,6 +20,7 @@ import org.apache.commons.beanutils.Converter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,11 +32,13 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/generic")
 public class GenericEntityController {
+    private final ViewContext viewContext;
     private final ServiceFactory serviceFactory;
     private final GenericService genericService;
     private final FieldUtil fieldUtil;
 
-    protected GenericEntityController(ServiceFactory serviceFactory, GenericService genericService, FieldUtil fieldUtil) {
+    protected GenericEntityController(ViewContext viewContext, ServiceFactory serviceFactory, GenericService genericService, FieldUtil fieldUtil) {
+        this.viewContext = viewContext;
         this.serviceFactory = serviceFactory;
         this.genericService = genericService;
         this.fieldUtil = fieldUtil;
@@ -45,6 +50,7 @@ public class GenericEntityController {
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "5") int size,
                        HttpServletRequest request) {
+        viewContext.setCurrentView(request.getRequestURI());
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
         MetaDataDTO metadata = genericService.getMetadata(clazz);
@@ -94,6 +100,7 @@ public class GenericEntityController {
                        @PathVariable(required = false) Object id,
                        Model model,
                        HttpServletRequest request) {
+        viewContext.setCurrentView(request.getRequestURI());
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
         MetaDataDTO metadata = genericService.getMetadata(clazz);
@@ -115,7 +122,9 @@ public class GenericEntityController {
     @PostMapping({"/{entity}/create", "/{entity}/edit/{id}"})
     public String submit(@PathVariable String entity,
                          @PathVariable(required = false) Object id,
+                         RedirectAttributes redirectAttributes,
                          HttpServletRequest request) throws InvocationTargetException, IllegalAccessException {
+        viewContext.setCurrentView(request.getRequestURI());
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
 
@@ -142,16 +151,19 @@ public class GenericEntityController {
         } else {
             jdbcService.insert(record);
         }
+
+        redirectAttributes.addFlashAttribute("message", MessageDTO.success("Thông báo", "Thao tác thành công"));
         return "redirect:/admin/generic/" + entity;
     }
 
     @PostMapping("/{entity}/delete/{id}")
-    public String delete(@PathVariable String entity, @PathVariable Object id) {
+    public String delete(@PathVariable String entity, @PathVariable Object id, RedirectAttributes redirectAttributes) {
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
 
         JdbcService jdbcService = serviceFactory.getService(clazz);
         jdbcService.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", MessageDTO.success("Thông báo", "Thao tác thành công"));
         return "redirect:/admin/generic/" + entity;
     }
 }

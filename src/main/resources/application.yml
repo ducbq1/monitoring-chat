@@ -1,76 +1,84 @@
 custom:
   multi-databases:
     authentication:
-      password: root
-      driver-class-name: oracle.jdbc.OracleDriver
-      username: fundamental_authentication
-      url: jdbc:oracle:thin:@localhost:1521:xe
+      username: ${AUTH_DB_USERNAME:fundamental_authentication}
+      password: ${AUTH_DB_PASSWORD:root}
+      url: ${AUTH_DB_URL:jdbc:oracle:thin:@localhost:1521:xe}
+      driver-class-name: ${AUTH_DB_DRIVER:oracle.jdbc.OracleDriver}
     h2:
-      url: jdbc:h2:file:./data/chatdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      username: sa
-      password:
-      driver-class-name: org.h2.Driver
+      url: ${H2_DB_URL:jdbc:h2:file:./data/chatdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+      username: ${H2_DB_USERNAME:sa}
+      password: ${H2_DB_PASSWORD:}
+      driver-class-name: ${H2_DB_DRIVER:org.h2.Driver}
     oracle:
-      url: jdbc:oracle:thin:@localhost:1521:xe
-      username: oracle_user
-      password: secret
-      driver-class-name: oracle.jdbc.OracleDriver
+      url: ${ORACLE_DB_URL:jdbc:oracle:thin:@localhost:1521:xe}
+      username: ${ORACLE_DB_USERNAME:oracle_user}
+      password: ${ORACLE_DB_PASSWORD:secret}
+      driver-class-name: ${ORACLE_DB_DRIVER:oracle.jdbc.OracleDriver}
     infrastructure:
-      url: jdbc:postgresql://localhost:5432/mydb
-      username: myuser
-      password: mypassword
-      driver-class-name: org.postgresql.Driver
+      url: ${INFRA_DB_URL:jdbc:postgresql://localhost:5432/mydb}
+      username: ${INFRA_DB_USERNAME:myuser}
+      password: ${INFRA_DB_PASSWORD:mypassword}
+      driver-class-name: ${INFRA_DB_DRIVER:org.postgresql.Driver}
     touchpoint:
-      url: jdbc:postgresql://localhost:5432/mydb
-      username: myuser
-      password: mypassword
-      driver-class-name: org.postgresql.Driver
+      url: ${TP_DB_URL:jdbc:postgresql://localhost:5432/mydb}
+      username: ${TP_DB_USERNAME:myuser}
+      password: ${TP_DB_PASSWORD:mypassword}
+      driver-class-name: ${TP_DB_DRIVER:org.postgresql.Driver}
     derby:
-      url: jdbc:derby:memory:mydb;create=true
-      username:
-      password:
-      driver-class-name: org.apache.derby.iapi.jdbc.AutoloadedDriver
+      url: ${DERBY_DB_URL:jdbc:derby:memory:mydb;create=true}
+      username: ${DERBY_DB_USERNAME:}
+      password: ${DERBY_DB_PASSWORD:}
+      driver-class-name: ${DERBY_DB_DRIVER:org.apache.derby.iapi.jdbc.AutoloadedDriver}
     profile:
-      url: protocol=jdbc:fisglobal|database=ip
-      username: user
-      password: pass
-      driver-class-name: fisglobal.jdbc.driver.ScDriver
+      url: ${PROFILE_DB_URL:protocol=jdbc:fisglobal|database=ip}
+      username: ${PROFILE_DB_USERNAME:user}
+      password: ${PROFILE_DB_PASSWORD:pass}
+      driver-class-name: ${PROFILE_DB_DRIVER:fisglobal.jdbc.driver.ScDriver}
 
 spring:
   datasource:
-    url: jdbc:h2:file:./data/chatdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/chatdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
+    database-platform: ${SPRING_JPA_PLATFORM:org.hibernate.dialect.H2Dialect}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: ${SPRING_JPA_DDL_AUTO:create-drop}
+
 chat:
   allowed-origin: ${CHAT_ALLOWED_ORIGIN:*}
 
 server:
+  compression:
+    enabled: ${SERVER_COMPRESSION_ENABLED:true}
+    mime-types: ${SERVER_COMPRESSION_MIME_TYPES:application/json, application/xml, text/html, text/xml, text/plain}
+    min-response-size: ${SERVER_COMPRESSION_MIN_SIZE:1KB}
+
   application:
-    authenticated: false
-    name: InjectMapFromYAML
-    url: http://injectmapfromyaml.dev
-    description: How To Inject a map from a YAML File in Spring Boot
+    authenticated: ${APP_AUTHENTICATED:false}
+    name: ${APP_NAME:InjectMapFromYAML}
+    url: ${APP_URL:http://injectmapfromyaml.dev}
+    description: ${APP_DESCRIPTION:How To Inject a map from a YAML File in Spring Boot}
+
   config:
     ips:
-      - 10.10.10.10
-      - 10.10.10.11
-      - 10.10.10.12
-      - 10.10.10.13
+      - ${SERVER_IP1:10.10.10.10}
+      - ${SERVER_IP2:10.10.10.11}
+      - ${SERVER_IP3:10.10.10.12}
+      - ${SERVER_IP4:10.10.10.13}
     filesystem:
-      - /dev/root
-      - /dev/md2
-      - /dev/md4
+      - ${FS1:/dev/root}
+      - ${FS2:/dev/md2}
+      - ${FS3:/dev/md4}
+
   users:
     root:
-      username: root
-      password: rootpass
+      username: ${ROOT_USERNAME:root}
+      password: ${ROOT_PASSWORD:rootpass}
     guest:
-      username: guest
-      password: guestpass
+      username: ${GUEST_USERNAME:guest}
+      password: ${GUEST_PASSWORD:guestpass}
