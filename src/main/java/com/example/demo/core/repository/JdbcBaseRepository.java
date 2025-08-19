@@ -8,13 +8,16 @@ import com.example.demo.core.mapper.AnnotationBasedRowMapper;
 import com.example.demo.core.mapper.PagedRowMapper;
 import com.example.demo.core.service.GenericService;
 import com.example.demo.exception.AppException;
+import com.example.demo.helper.DbMetadataHelper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRepository<T> {
+    private final DbMetadataHelper dbMetadataHelper;
     private final Class<T> entityClass;
     private final DynamicDataSourceConfig dynamicDataSourceConfig;
     private final GenericService genericService;
@@ -22,7 +25,8 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     private final String tableName;
     private final String dataSource;
 
-    public JdbcBaseRepository(Class<T> entityClass, DynamicDataSourceConfig dynamicDataSourceConfig, GenericService genericService) {
+    public JdbcBaseRepository(DbMetadataHelper dbMetadataHelper, Class<T> entityClass, DynamicDataSourceConfig dynamicDataSourceConfig, GenericService genericService) {
+        this.dbMetadataHelper = dbMetadataHelper;
         this.entityClass = entityClass;
         this.dynamicDataSourceConfig = dynamicDataSourceConfig;
         this.genericService = genericService;
@@ -167,6 +171,12 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     @Override
     public int count() {
         String sql = "SELECT COUNT(*) FROM " + tableName;
+        try {
+            var x = dbMetadataHelper.getColumns(tableName);
+            var y = dbMetadataHelper.getPrimaryKeys(tableName);
+        } catch (SQLException e) {
+
+        }
         return jdbcTemplate().queryForObject(sql, Integer.class);
     }
 
