@@ -5,6 +5,7 @@ import com.example.demo.core.annotation.Column;
 import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.mapper.AnnotationBasedRowMapper;
 import com.example.demo.core.mapper.PagedRowMapper;
+import com.example.demo.core.model.ColumnData;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.model.PrimaryKeyInfoDTO;
 import com.example.demo.core.model.TableInfoDTO;
@@ -15,9 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -247,6 +246,81 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
         }
     }
 
+    @Override
+    public List<ColumnData> getRecordWithMetadata(
+            JdbcTemplate jdbcTemplate,
+            String tableName,
+            Object idValue
+    ) throws SQLException {
+        List<ColumnData> result = new ArrayList<>();
+
+        try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+
+            List<String> primaryKeys = new ArrayList<>();
+            try (ResultSet pkRs = metaData.getPrimaryKeys(null, null, tableName)) {
+                while (pkRs.next()) {
+                    primaryKeys.add(pkRs.getString("COLUMN_NAME"));
+                }
+            }
+
+            if (primaryKeys.isEmpty()) {
+                throw new SQLException("Table " + tableName + " does not have a primary key.");
+            }
+            if (primaryKeys.size() > 1) {
+                throw new SQLException("Table " + tableName + " has multiple primary keys (composite PK not supported).");
+            }
+
+            String idColumn = primaryKeys.get(0);
+
+            ResultSet columns = metaData.getColumns(null, null, tableName, null);
+            List<String> columnNames = new ArrayList<>();
+            Map<String, ColumnData> metaMap = new HashMap<>();
+
+            while (columns.next()) {
+                String columnName = columns.getString("COLUMN_NAME");
+                String typeName = columns.getString("TYPE_NAME");
+                int size = columns.getInt("COLUMN_SIZE");
+                int nullable = columns.getInt("NULLABLE");
+                String remarks = columns.getString("REMARKS");
+                String defaultValue = columns.getString("COLUMN_DEF");
+
+                ColumnData col = new ColumnData();
+                col.setColumnName(columnName);
+                col.setTypeName(typeName);
+                col.setSize(size);
+                col.setNullable(nullable == DatabaseMetaData.columnNullable);
+                col.setRemarks(remarks);
+                col.setDefaultValue(defaultValue);
+                col.setPrimaryKey(primaryKeys.contains(columnName));
+
+                columnNames.add(columnName);
+                metaMap.put(columnName, col);
+            }
+
+            int batchSize = 30;
+            for (int i = 0; i < columnNames.size(); i += batchSize) {
+                List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
+                String sql = "SELECT " + String.join(", ", batch) +
+                        " FROM " + tableName +
+                        " WHERE " + idColumn + " = ?";
+
+                Map<String, Object> row = jdbcTemplate.queryForMap(sql, idValue);
+                for (String colName : batch) {
+                    if (metaMap.containsKey(colName)) {
+                        ColumnData col = metaMap.get(colName);
+                        col.setValue(row.get(colName));
+                    }
+                }
+            }
+
+            for (String colName : columnNames) {
+                result.add(metaMap.get(colName));
+            }
+        }
+
+        return result;
+    }
 
     private JdbcTemplate jdbcTemplate() {
         return dynamicDataSourceConfig.getJdbcTemplate(tableInfo.datasource());
