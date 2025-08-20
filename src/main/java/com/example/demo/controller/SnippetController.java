@@ -26,7 +26,7 @@ public class SnippetController {
         snippets.forEach(Snippet::prepareTagList); // Tách tagList
         model.addAttribute("snippetList", snippets);
         ViewHelper.setView(model, "view/snippet", "Code Snippet Manager");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @PostMapping("/save")

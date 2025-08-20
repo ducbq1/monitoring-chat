@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<head>
+    <title>Record Detail</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const recordId = [[${record.id}]];
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get("userId") || "demoUser";
+            const tabId  = params.get("tabId");
+
+            document.getElementById("uf_userId").value = userId;
+            document.getElementById("uf_tabId").value  = tabId;
+
+            function sendHeartbeat() {
+                fetch(`/records/${recordId}/heartbeat?userId=${encodeURIComponent(userId)}&tabId=${encodeURIComponent(tabId)}`, {
+                    method: "POST"
+                }).catch(() => {});
+            }
+
+            const hb = setInterval(sendHeartbeat, 5000);
+
+            let unlockData;
+            let action;
+
+            function prepareUnlockData(userId, tabId) {
+                const form = document.getElementById("unlockForm");
+                document.getElementById("uf_userId").value = userId;
+                document.getElementById("uf_tabId").value  = tabId;
+                unlockData = new FormData(form);
+                action = form.action
+            }
+
+            prepareUnlockData(userId, tabId);
+
+            window.addEventListener("beforeunload", () => {
+                const navType = performance.getEntriesByType("navigation")[0].type;
+                const nextUrl = document.activeElement?.href || document.referrer;
+                console.log(navType, nextUrl);
+                if (navType === "reload" || window.location.href === nextUrl) {
+                    return;
+                } else {
+                    navigator.sendBeacon(action, unlockData);
+                }
+            });
+
+            const unlockBtn = document.getElementById("unlockBtn");
+            if (unlockBtn) {
+                unlockBtn.addEventListener("click", () => {
+                    clearInterval(hb);
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+<h1>Record Detail</h1>
+<p>ID: [[${record.id}]]</p>
+<p>Name: [[${record.lockedBy}]]</p>
+
+<div th:if="${locked}">
+    <p style="color:green">✅ Bạn đã lock record này</p>
+
+    <!-- Form để sendBeacon khi đóng tab -->
+    <form id="unlockForm" method="post" th:action="@{|/records/${record.id}/unlock|}">
+        <input type="hidden" id="uf_userId" name="userId" value=""/>
+        <input type="hidden" id="uf_tabId"  name="tabId"  value=""/>
+        <button id="unlockBtn" type="submit">Unlock</button>
+    </form>
+</div>
+
+<div th:if="${!locked}">
+    <p style="color:red">❌ Record đang bị lock bởi [[${record.lockedBy}]]</p>
+    <a href="/records">Quay lại</a>
+</div>
+</body>
+</html>

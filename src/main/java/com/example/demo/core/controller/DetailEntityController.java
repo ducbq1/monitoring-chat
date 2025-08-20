@@ -107,7 +107,7 @@ public class DetailEntityController {
         JdbcService jdbcService = serviceFactory.getService(clazz);
         BaseEntity record = (id != null) ? jdbcService.findById(id) : fieldUtil.create(clazz);
 
-        String listUri = UriComponentsBuilder.fromPath("/admin/generic/{entity}")
+        String listUri = UriComponentsBuilder.fromPath("/admin/generic/inquiry/{entity}")
                 .buildAndExpand(entity)
                 .toUriString();
         model.addAttribute("listUri", listUri);
@@ -152,7 +152,7 @@ public class DetailEntityController {
         }
 
         redirectAttributes.addFlashAttribute("message", MessageDTO.success("Thông báo", "Thao tác thành công"));
-        return "redirect:/admin/generic/" + entity;
+        return "redirect:/admin/generic/inquiry/" + entity;
     }
 
     @PostMapping("/{entity}/delete/{id}")
@@ -163,6 +163,6 @@ public class DetailEntityController {
         JdbcService jdbcService = serviceFactory.getService(clazz);
         jdbcService.deleteById(id);
         redirectAttributes.addFlashAttribute("message", MessageDTO.success("Thông báo", "Thao tác thành công"));
-        return "redirect:/admin/generic/" + entity;
+        return "redirect:/admin/generic/inquiry/" + entity;
     }
 }

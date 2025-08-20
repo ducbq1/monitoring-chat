@@ -74,7 +74,7 @@ public class ChatController {
             model.addAttribute("room", ""); // để client tự lấy từ localStorage
         }
         ViewHelper.setView(model, "view/chat", "Chat Room");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @EventListener

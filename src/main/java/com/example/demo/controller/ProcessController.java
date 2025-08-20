@@ -40,7 +40,7 @@ public class ProcessController {
                 .collect(Collectors.toList());
         model.addAttribute("javaProcesses", processes);
         ViewHelper.setView(model, "view/process", "Java Process Manager");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @GetMapping("/export")

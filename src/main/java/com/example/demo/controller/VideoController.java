@@ -30,7 +30,7 @@ public class VideoController {
     @GetMapping("/video")
     public String videoPage(Model model) {
         ViewHelper.setView(model, "view/video-player", "Video Player");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     // Stream video hỗ trợ Range (tua, phát mượt)

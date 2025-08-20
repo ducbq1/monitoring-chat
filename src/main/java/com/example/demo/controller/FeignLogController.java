@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.request.LogRequestDTO;
 import com.example.demo.helper.ViewHelper;
 import com.example.demo.model.FeignLog;
 import com.example.demo.repository.FeignLogRepository;
@@ -9,13 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -44,7 +46,7 @@ public class FeignLogController {
         model.addAttribute("logPage", logPage);
         model.addAttribute("keyword", keyword);
         ViewHelper.setView(model, "view/feign-logs", "Feign Logs");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @GetMapping("/feign-logs/export")
@@ -65,5 +67,4 @@ public class FeignLogController {
         }
         writer.flush();
     }
-
 }

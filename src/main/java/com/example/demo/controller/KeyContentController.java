@@ -45,7 +45,7 @@ public class KeyContentController {
         List<KeyContent> dataList = repository.findAll();
         model.addAttribute("dataList", dataList);
         ViewHelper.setView(model, "view/content-store", "Content Store");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @PostMapping("/upload")
@@ -76,7 +76,7 @@ public class KeyContentController {
         List<KeyContent> dataList = repository.findByStorageKeyContainingIgnoreCase(key);
         model.addAttribute("dataList", dataList);
         ViewHelper.setView(model, "view/content-store", "Content Store");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @GetMapping("/delete/{id}")
@@ -122,7 +122,7 @@ public class KeyContentController {
         KeyContent data = repository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
         model.addAttribute("data", data);
         ViewHelper.setView(model, "view/content-store-edit", "Content Store");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @PostMapping("/edit/{id}")

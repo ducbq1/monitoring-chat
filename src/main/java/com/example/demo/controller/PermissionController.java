@@ -3,37 +3,26 @@ package com.example.demo.controller;
 import com.example.demo.config.DynamicDataSourceConfig;
 import com.example.demo.exception.AppException;
 import com.example.demo.helper.ViewHelper;
-import com.example.demo.model.Permission;
 import com.example.demo.model.Resource;
-import com.example.demo.model.Role;
 import com.example.demo.model.User;
-import com.example.demo.repository.PermissionRepository;
-import com.example.demo.repository.ResourceRepository;
-import com.example.demo.repository.RoleRepository;
-import com.example.demo.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/authorization")
-public class AuthorizationController {
+public class PermissionController {
 
     private final DynamicDataSourceConfig dynamicDataSourceConfig;
 
-    public AuthorizationController(DynamicDataSourceConfig dynamicDataSourceConfig) {
+    public PermissionController(DynamicDataSourceConfig dynamicDataSourceConfig) {
         this.dynamicDataSourceConfig = dynamicDataSourceConfig;
     }
 

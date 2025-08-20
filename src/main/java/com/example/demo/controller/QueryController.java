@@ -41,7 +41,7 @@ public class QueryController {
         model.addAttribute("error", null);
         model.addAttribute("tables", getH2TableNames());
         ViewHelper.setView(model, "view/query", "SQL Playground");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 
     @PostMapping("/execute")
@@ -73,6 +73,6 @@ public class QueryController {
 
         model.addAttribute("tables", getH2TableNames());
         ViewHelper.setView(model, "view/query", "SQL Playground");
-        return "layout"; // Load layout.html
+        return "layout";
     }
 }

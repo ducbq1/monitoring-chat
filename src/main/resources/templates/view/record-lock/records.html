@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<head>
+    <title>Records</title>
+</head>
+<body>
+<h1>Records List</h1>
+
+<ul>
+    <li th:each="r : ${records}">
+        <!-- data-id để JS lấy id khi click -->
+        <a href="#" class="record-link" th:attr="data-id=${r.id}">
+            [[${r.lockedBy}]]
+        </a>
+    </li>
+</ul>
+
+<!-- Input để nhập ID muốn lock -->
+<label>
+    Record ID:
+    <input type="number" id="recordIdInput"/>
+</label>
+<button id="lockBtn">Lock</button>
+
+<script>
+    // Lấy userId từ server nếu có (ví dụ Thymeleaf), còn không thì hard-code demo:
+    const userId = "demoUser";
+
+    // Dùng 1 tabId cho cả TAB, tái sử dụng ở mọi lần mở chi tiết trong cùng tab
+    function getOrCreateTabId() {
+        let id = sessionStorage.getItem("tabId");
+        if (!id) {
+            id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random();
+            sessionStorage.setItem("tabId", id);
+        }
+        return id;
+    }
+
+    function openRecord(recordId, openNewTab) {
+        const tabId = getOrCreateTabId();
+        const url = `/records/${encodeURIComponent(recordId)}?userId=${encodeURIComponent(userId)}&tabId=${encodeURIComponent(tabId)}`;
+        if (openNewTab) {
+            window.open(url, "_blank");
+        } else {
+            window.location.href = url;
+        }
+    }
+
+    // Click bình thường
+    document.querySelectorAll(".record-link").forEach(link => {
+        link.addEventListener("click", e => {
+            e.preventDefault();
+            const id = link.getAttribute("data-id");
+            const openNew = e.ctrlKey || e.metaKey; // Ctrl/Cmd để mở tab mới
+            openRecord(id, openNew);
+        });
+
+        // Middle-click mở tab mới
+        link.addEventListener("auxclick", e => {
+            if (e.button === 1) {
+                e.preventDefault();
+                const id = link.getAttribute("data-id");
+                openRecord(id, true);
+            }
+        });
+    });
+
+    document.getElementById("lockBtn").addEventListener("click", async () => {
+        const recordId = document.getElementById("recordIdInput").value;
+        if (!recordId) {
+            alert("Nhập recordId trước đã!");
+            return;
+        }
+        const tabId = getOrCreateTabId();
+        window.location.href = `/records/${encodeURIComponent(recordId)}?userId=${encodeURIComponent(userId)}&tabId=${encodeURIComponent(tabId)}`
+    });
+</script>
+</body>
+</html>
