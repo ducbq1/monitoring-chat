@@ -5,7 +5,7 @@ public class MessageDTO {
     private String title;
     private String detail;
 
-    public MessageDTO(String type, String title, String detail) {
+    private MessageDTO(String type, String title, String detail) {
         this.type = type;
         this.title = title;
         this.detail = detail;

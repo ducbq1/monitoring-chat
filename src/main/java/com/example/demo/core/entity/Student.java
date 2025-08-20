@@ -3,11 +3,10 @@ package com.example.demo.core.entity;
 import com.example.demo.core.annotation.*;
 
 @Metadata(menu = "Học sinh", title = "Học sinh")
-@DataSource(name = "touchpoint")
-@Table(name = "student")
+@Table(datasource = "touchpoint", name = "student")
 public class Student extends BaseEntity {
 
-    @PrimaryKey
+    @PrimaryKey(sequence = "student_seq")
     @Column(name = "name", title = "Tên")
     private String name;
 

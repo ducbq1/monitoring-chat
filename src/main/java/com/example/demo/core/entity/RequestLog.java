@@ -5,12 +5,10 @@ import com.example.demo.core.annotation.*;
 import java.time.LocalDateTime;
 
 @Metadata(menu = "Nhật ký thao tác", title = "Nhật ký thao tác")
-@DataSource(name = "h2")
-@Table(name = "bts_request_log")
+@Table(datasource = "h2", name = "bts_request_log")
 public class RequestLog extends BaseEntity {
 
     @PrimaryKey
-    @GeneratedValue
     @Column(name = "id", title = "ID")
     private Long id;
 

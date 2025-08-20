@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.exception;
 
 import com.example.demo.core.repository.GlobalSidebar;
 import jakarta.servlet.http.HttpServletRequest;

@@ -3,8 +3,7 @@ package com.example.demo.core.entity;
 import com.example.demo.core.annotation.*;
 
 @Metadata(menu = "Cấu hình tham số", title = "Cấu hình tham số")
-@DataSource(name = "touchpoint")
-@Table(name = "global_defaults")
+@Table(datasource = "touchpoint", name = "global_defaults")
 public class GlobalDefault extends BaseEntity {
 
     @PrimaryKey

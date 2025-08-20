@@ -1,12 +1,15 @@
 package com.example.demo.core.repository;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.DatabaseDTO;
 
 import java.util.List;
 import java.util.Map;
 
 public interface JdbcRepository<T extends BaseEntity> {
     List<T> findAll();
+
+    List<T> paginateSkip(int page, int limit);
 
     List<T> paginate(int page, int limit);
 
@@ -29,4 +32,6 @@ public interface JdbcRepository<T extends BaseEntity> {
     int count();
 
     int count(Map<String, Object> filters);
+
+    DatabaseDTO getDatabaseInfo();
 }

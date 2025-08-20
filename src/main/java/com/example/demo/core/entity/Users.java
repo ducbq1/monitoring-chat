@@ -5,8 +5,7 @@ import com.example.demo.core.annotation.*;
 import java.math.BigDecimal;
 
 @Metadata(menu = "Người dùng", title = "Người dùng")
-@DataSource(name = "authentication")
-@Table(name = "Users")
+@Table(datasource = "authentication", name = "Users")
 public class Users extends BaseEntity {
 
     @PrimaryKey

@@ -1,6 +1,7 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.DatabaseDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -29,4 +30,6 @@ public interface JdbcService<T extends BaseEntity> {
     int count();
 
     int count(Map<String, Object> filters);
+
+    DatabaseDTO getDatabaseInfo();
 }

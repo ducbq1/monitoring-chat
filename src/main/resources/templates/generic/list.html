@@ -116,14 +116,52 @@
             font-size: 0.875rem;
             padding: 0.35rem 0.7rem;
         }
+        .section-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .section-title .db-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1f2937; /* text-gray-800 */
+        }
+
+        .section-title .database-name {
+            font-size: 0.95rem;
+            color: #4b5563; /* text-gray-600 */
+            background: #f9fafb; /* bg-gray-50 */
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px solid #e5e7eb; /* subtle border */
+        }
+
+        .section-title .database-name span:first-child {
+            font-weight: 500;
+            color: #111827; /* darker text for db name */
+        }
+
+        .section-title .database-name span:not(:first-child) {
+            color: #6b7280; /* lighter for dbType, version, driver */
+        }
+
     </style>
 </head>
 <body>
 <section class="container-fluid btn-action">
     <div class="section-title">
         <div th:text="${table.metadata.title}">Entity Title</div>
-        <div class="database-name" th:text="${table.metadata.database}">database_name</div>
+        <div class="database-name">
+            <span th:text="${table.metadata.database.name}">db_name</span>
+            (<span th:text="${table.metadata.database.dbType}">dbType</span>,
+            <span th:text="${table.metadata.database.version}">version</span>,
+            <span th:text="${table.metadata.database.driver}">driver</span>)
+        </div>
     </div>
+
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <a th:href="@{${requestUri} + '/create'}" class="btn btn-primary">

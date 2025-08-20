@@ -1,8 +1,7 @@
-package com.example.demo.controller;
+package com.example.demo.exception;
 
 import com.example.demo.core.model.MessageDTO;
 import com.example.demo.core.repository.ViewContext;
-import com.example.demo.exception.AppException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;

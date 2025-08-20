@@ -61,7 +61,7 @@
                                     <span th:text="${subItem['title']}" class="fw-medium"></span>
                                 </div>
 
-                                <small th:text="${subItem['database']}"
+                                <small th:text="${subItem.database.name}"
                                        th:classappend="${requestUri.startsWith(subItem['href'])} ? 'text-white ms-4' : 'text-muted ms-4'"></small>
                             </a>
                         </li>

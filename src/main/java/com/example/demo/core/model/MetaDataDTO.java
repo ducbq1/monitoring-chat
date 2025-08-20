@@ -8,7 +8,7 @@ public class MetaDataDTO {
     private String menu;
     private String title;
     private String icon;
-    private String database;
+    private DatabaseDTO database;
     private String table;
 
     public MetaDataDTO() {
@@ -55,11 +55,11 @@ public class MetaDataDTO {
         this.icon = icon;
     }
 
-    public String getDatabase() {
+    public DatabaseDTO getDatabase() {
         return database;
     }
 
-    public void setDatabase(String database) {
+    public void setDatabase(DatabaseDTO database) {
         this.database = database;
     }
 
@@ -79,7 +79,7 @@ public class MetaDataDTO {
         private String menu;
         private String title;
         private String icon;
-        private String database;
+        private DatabaseDTO database;
         private String table;
 
         public Builder menu(String menu) {
@@ -97,7 +97,7 @@ public class MetaDataDTO {
             return this;
         }
 
-        public Builder database(String database) {
+        public Builder database(DatabaseDTO database) {
             this.database = database;
             return this;
         }

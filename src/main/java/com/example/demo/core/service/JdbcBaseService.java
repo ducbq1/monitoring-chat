@@ -1,6 +1,7 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.repository.JdbcRepository;
 
 import java.util.List;
@@ -71,5 +72,10 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     @Override
     public int count(Map<String, Object> filters) {
         return repository.count(filters);
+    }
+
+    @Override
+    public DatabaseDTO getDatabaseInfo() {
+        return repository.getDatabaseInfo();
     }
 }

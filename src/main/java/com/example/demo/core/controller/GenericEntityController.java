@@ -2,13 +2,13 @@ package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.entity.GlobalDefault;
+import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.model.MessageDTO;
 import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
 import com.example.demo.core.repository.EntityRegistry;
 import com.example.demo.core.repository.RepositoryFactory;
 import com.example.demo.core.repository.ViewContext;
-import com.example.demo.core.service.GenericService;
 import com.example.demo.core.service.JdbcService;
 import com.example.demo.core.service.ServiceFactory;
 import com.example.demo.helper.FieldUtil;
@@ -34,13 +34,11 @@ import java.util.Map;
 public class GenericEntityController {
     private final ViewContext viewContext;
     private final ServiceFactory serviceFactory;
-    private final GenericService genericService;
     private final FieldUtil fieldUtil;
 
-    protected GenericEntityController(ViewContext viewContext, ServiceFactory serviceFactory, GenericService genericService, FieldUtil fieldUtil) {
+    protected GenericEntityController(ViewContext viewContext, ServiceFactory serviceFactory, FieldUtil fieldUtil) {
         this.viewContext = viewContext;
         this.serviceFactory = serviceFactory;
-        this.genericService = genericService;
         this.fieldUtil = fieldUtil;
     }
 
@@ -53,7 +51,7 @@ public class GenericEntityController {
         viewContext.setCurrentView(request.getRequestURI());
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
-        MetaDataDTO metadata = genericService.getMetadata(clazz);
+        MetaDataDTO metadata = fieldUtil.getMetadata(clazz);
 
         Map<String, String[]> rawParams = request.getParameterMap();
         Map<String, String> filters = new HashMap<>();
@@ -69,7 +67,10 @@ public class GenericEntityController {
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         List<BaseEntity> records = filters.isEmpty() ? jdbcService.paginate(page, size) :  jdbcService.paginate(page, size, filters);
-        List<Map<String, Object>> columns = genericService.getColumns(clazz);
+        List<Map<String, Object>> columns = fieldUtil.getColumns(clazz);
+
+        DatabaseDTO database = jdbcService.getDatabaseInfo();
+        metadata.setDatabase(database);
 
         TablePageDTO<BaseEntity> dto = new TablePageDTO<BaseEntity>()
                 .setMetadata(metadata)
@@ -103,17 +104,17 @@ public class GenericEntityController {
         viewContext.setCurrentView(request.getRequestURI());
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
-        MetaDataDTO metadata = genericService.getMetadata(clazz);
+        MetaDataDTO metadata = fieldUtil.getMetadata(clazz);
 
         JdbcService jdbcService = serviceFactory.getService(clazz);
-        BaseEntity record = (id != null) ? jdbcService.findById(id) : genericService.create(clazz);
+        BaseEntity record = (id != null) ? jdbcService.findById(id) : fieldUtil.create(clazz);
 
         String listUri = UriComponentsBuilder.fromPath("/admin/generic/{entity}")
                 .buildAndExpand(entity)
                 .toUriString();
         model.addAttribute("listUri", listUri);
         model.addAttribute("record", record);
-        model.addAttribute("columns", genericService.getColumns(clazz));
+        model.addAttribute("columns", fieldUtil.getColumns(clazz));
         model.addAttribute("requestUri", request.getRequestURI());
         ViewHelper.setView(model, "generic/form", metadata.getTitle());
         return "layout";
@@ -128,7 +129,7 @@ public class GenericEntityController {
         Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
         if (clazz == null) return "redirect:/admin";
 
-        BaseEntity record = genericService.create(clazz);
+        BaseEntity record = fieldUtil.create(clazz);
 
         ConvertUtils.register(new Converter() {
             @Override

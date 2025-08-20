@@ -4,12 +4,10 @@ import com.example.demo.core.annotation.*;
 
 import java.time.LocalDateTime;
 
-@DataSource(name = "infrastructure")
-@Table(name = "bts_request_log")
+@Table(datasource = "infrastructure", name = "bts_request_log")
 public class Log {
 
     @PrimaryKey
-    @GeneratedValue
     @Column(name = "id")
     private Long id;
 

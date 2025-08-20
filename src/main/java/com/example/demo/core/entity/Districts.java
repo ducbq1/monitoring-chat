@@ -3,8 +3,7 @@ package com.example.demo.core.entity;
 import com.example.demo.core.annotation.*;
 
 @Metadata(menu = "Quận huyện", title = "Quận huyện")
-@DataSource(name = "authentication")
-@Table(name = "Districts")
+@Table(datasource = "authentication", name = "Districts")
 public class Districts extends BaseEntity {
 
     @PrimaryKey
