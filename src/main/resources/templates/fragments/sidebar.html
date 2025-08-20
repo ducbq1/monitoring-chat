@@ -70,6 +70,42 @@
 
             </li>
 
+            <li class="nav-item mb-1">
+                <a class="nav-link d-flex align-items-center justify-content-between"
+                   data-bs-toggle="collapse"
+                   href="#inquiryManagerMenu"
+                   role="button"
+                   th:attr="aria-expanded=${@sidebarUtil.isAnyActive(inquirySidebarMenu, requestUri)}"
+                   aria-controls="inquiryManagerMenu">
+                    <span>
+                        <i class="bi bi-folder2-open me-2"></i> <!-- icon menu cha -->
+                        <span>Inquiry Detail</span>
+                    </span>
+                    <i class="bi bi-chevron-down"></i>
+                </a>
+
+                <div class="collapse collapse-animated" id="inquiryManagerMenu"
+                     th:classappend="${@sidebarUtil.isAnyActive(inquirySidebarMenu, requestUri)} ? 'show' : ''">
+                    <ul class="nav flex-column ms-3 mb-1 sub-menu">
+                        <li class="nav-item mb-1" th:each="subItem : ${inquirySidebarMenu}">
+                            <a th:href="@{${subItem['href']}}"
+                               th:classappend="${requestUri.startsWith(subItem['href'])} ? 'active text-white' : 'text-dark'"
+                               class="nav-link d-flex flex-column align-items-start py-1">
+
+                                <div class="d-flex align-items-center">
+                                    <i th:classappend="${subItem['icon']} + ' me-2'"></i>
+                                    <span th:text="${subItem['title']}" class="fw-medium"></span>
+                                </div>
+
+                                <small th:text="${subItem.database.name}"
+                                       th:classappend="${requestUri.startsWith(subItem['href'])} ? 'text-white ms-4' : 'text-muted ms-4'"></small>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </li>
+
             <hr class="my-2">
 
             <!-- Tools -->

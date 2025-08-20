@@ -10,6 +10,7 @@ public class MetaDataDTO {
     private String icon;
     private DatabaseDTO database;
     private String table;
+    private String type;
 
     public MetaDataDTO() {
     }
@@ -27,8 +28,16 @@ public class MetaDataDTO {
         for (Field field : getClass().getDeclaredFields()) {
             map.put(field.getName(), field.get(this));
         }
-        map.put("href", "/admin/generic/" + table);
+        map.put("href", "/admin/generic/" + type + "/" + table);
         return map;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getMenu() {

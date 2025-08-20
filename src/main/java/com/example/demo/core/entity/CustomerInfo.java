@@ -2,7 +2,7 @@ package com.example.demo.core.entity;
 
 import com.example.demo.core.annotation.*;
 
-@Metadata(menu = "Hồ sơ thông tin khách hàng", title = "Hồ sơ thông tin khách hàng")
+@Metadata(menu = "Hồ sơ thông tin khách hàng", title = "Hồ sơ thông tin khách hàng", type = "inquiry")
 @Table(datasource = "profile", name = "CIF")
 public class CustomerInfo extends BaseEntity {
 

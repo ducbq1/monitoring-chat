@@ -4,7 +4,7 @@ import com.example.demo.core.annotation.*;
 
 import java.time.LocalDateTime;
 
-@Metadata(menu = "Nhật ký thao tác", title = "Nhật ký thao tác")
+@Metadata(menu = "Nhật ký thao tác", title = "Nhật ký thao tác", type = "inquiry")
 @Table(datasource = "h2", name = "bts_request_log")
 public class RequestLog extends BaseEntity {
 

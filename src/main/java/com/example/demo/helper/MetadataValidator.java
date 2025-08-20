@@ -23,7 +23,8 @@ public class MetadataValidator {
         }
         dto.setMenu(metadata.menu());
         dto.setTitle(metadata.title());
-        dto.setIcon(metadata.icon().isEmpty() ? null : metadata.icon());
+        dto.setIcon(metadata.icon());
+        dto.setType(metadata.type());
 
         // Check @Table
         if (!clazz.isAnnotationPresent(Table.class)) {

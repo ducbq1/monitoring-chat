@@ -28,11 +28,11 @@ public class RepositoryFactory {
     @SuppressWarnings("unchecked")
     public <T extends BaseEntity> JdbcBaseRepository<T> getRepository(Class<T> clazz) {
         return (JdbcBaseRepository<T>) cache.computeIfAbsent(clazz, c -> {
-//            try {
-//                validatePrimaryKey(clazz, dynamicDataSourceConfig);
-//            } catch (SQLException e) {
-//                throw new RuntimeException(e);
-//            }
+            try {
+                validatePrimaryKey(clazz, dynamicDataSourceConfig);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
             return new JdbcBaseRepository<>(clazz, dynamicDataSourceConfig, fieldUtil) {
             };
         }

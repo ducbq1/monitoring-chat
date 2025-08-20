@@ -27,4 +27,9 @@ public class GlobalControllerAdvice {
     public List<Map<String, Object>> sidebarMenu() {
         return globalSidebar.getSidebarMenu();
     }
+
+    @ModelAttribute("inquirySidebarMenu")
+    public List<Map<String, Object>> inquirySidebarMenu() {
+        return globalSidebar.getInquirySidebarMenu();
+    }
 }

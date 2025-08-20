@@ -22,29 +22,29 @@ import java.util.Map;
 public abstract class BaseController<T extends BaseEntity> {
     private final FieldUtil fieldUtil;
     private final Class<T> entityClass;
-    private final JdbcService<T> jdbcService;
+    private final ServiceFactory serviceFactory;
 
     protected final String basePath;
     protected final String viewPrefix;
 
     protected BaseController(ServiceFactory serviceFactory, FieldUtil fieldUtil, Class<T> entityClass, String basePath, String viewPrefix) {
+        this.serviceFactory = serviceFactory;
         this.fieldUtil = fieldUtil;
         this.entityClass = entityClass;
         this.basePath = basePath;
         this.viewPrefix = viewPrefix;
-        jdbcService = serviceFactory.getService(entityClass);
     }
 
     @GetMapping
     public String list(Model model,
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "5") int size) {
-        long totalElements = jdbcService.count();
+        long totalElements = jdbcService().count();
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
-        List<T> records = jdbcService.paginate(page, size);
+        List<T> records = jdbcService().paginate(page, size);
         List<Map<String, Object>> columns = fieldUtil.getColumns(entityClass);
-        DatabaseDTO database = jdbcService.getDatabaseInfo();
+        DatabaseDTO database = jdbcService().getDatabaseInfo();
         MetaDataDTO metadata = fieldUtil.getMetadata(entityClass);
         metadata.setDatabase(database);
 
@@ -81,14 +81,14 @@ public abstract class BaseController<T extends BaseEntity> {
 
     @PostMapping("/create")
     public String createSubmit(@ModelAttribute T record) {
-        jdbcService.insert(record);
+        jdbcService().insert(record);
         return "redirect:" + basePath;
     }
 
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Object id, Model model, HttpServletRequest request) {
         MetaDataDTO metadata = fieldUtil.getMetadata(entityClass);
-        T record = jdbcService.findById(id);
+        T record = jdbcService().findById(id);
         model.addAttribute("record", record);
         model.addAttribute("columns", fieldUtil.getColumns(entityClass));
         model.addAttribute("listUri", basePath);
@@ -100,13 +100,17 @@ public abstract class BaseController<T extends BaseEntity> {
     @PostMapping("/edit/{id}")
     public String editSubmit(@PathVariable Object id, @ModelAttribute T record) {
         fieldUtil.setPrimaryKeyValue(record, id);
-        jdbcService.update(record);
+        jdbcService().update(record);
         return "redirect:" + basePath;
     }
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Object id) {
-        jdbcService.deleteById(id);
+        jdbcService().deleteById(id);
         return "redirect:" + basePath;
+    }
+    
+    private JdbcService<T> jdbcService() {
+        return serviceFactory.getService(entityClass);
     }
 }

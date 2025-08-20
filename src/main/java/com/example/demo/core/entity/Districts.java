@@ -2,7 +2,7 @@ package com.example.demo.core.entity;
 
 import com.example.demo.core.annotation.*;
 
-@Metadata(menu = "Quận huyện", title = "Quận huyện")
+@Metadata(menu = "Quận huyện", title = "Quận huyện", roles ="df, dfd")
 @Table(datasource = "authentication", name = "Districts")
 public class Districts extends BaseEntity {
 

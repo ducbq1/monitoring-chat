@@ -1,13 +1,11 @@
 package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.entity.GlobalDefault;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.model.MessageDTO;
 import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
 import com.example.demo.core.repository.EntityRegistry;
-import com.example.demo.core.repository.RepositoryFactory;
 import com.example.demo.core.repository.ViewContext;
 import com.example.demo.core.service.JdbcService;
 import com.example.demo.core.service.ServiceFactory;
@@ -30,13 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/generic/list")
-public class GenericEntityController {
+@RequestMapping("/admin/generic/inquiry")
+public class DetailEntityController {
     private final ViewContext viewContext;
     private final ServiceFactory serviceFactory;
     private final FieldUtil fieldUtil;
 
-    protected GenericEntityController(ViewContext viewContext, ServiceFactory serviceFactory, FieldUtil fieldUtil) {
+    protected DetailEntityController(ViewContext viewContext, ServiceFactory serviceFactory, FieldUtil fieldUtil) {
         this.viewContext = viewContext;
         this.serviceFactory = serviceFactory;
         this.fieldUtil = fieldUtil;
