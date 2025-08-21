@@ -12,6 +12,9 @@ import com.example.demo.core.model.TableInfoDTO;
 import com.example.demo.exception.AppException;
 import com.example.demo.helper.DbMetadataHelper;
 import com.example.demo.helper.FieldUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -21,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRepository<T> {
+    private static final Logger log = LoggerFactory.getLogger(JdbcBaseRepository.class);
     private final DynamicDataSourceConfig dynamicDataSourceConfig;
     private final Class<T> entityClass;
     private final FieldUtil fieldUtil;
@@ -301,12 +305,16 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                         " FROM " + tableName +
                         " WHERE " + idColumn + " = ?";
 
-                Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
-                for (String colName : batch) {
-                    if (metaMap.containsKey(colName)) {
-                        ColumnData col = metaMap.get(colName);
-                        col.setValue(row.get(colName));
+                try {
+                    Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
+                    for (String colName : batch) {
+                        if (metaMap.containsKey(colName)) {
+                            ColumnData col = metaMap.get(colName);
+                            col.setValue(row.get(colName));
+                        }
                     }
+                } catch (DataAccessException e){
+                    log.error(e.getMessage(), e);
                 }
             }
 
