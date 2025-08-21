@@ -247,18 +247,14 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     }
 
     @Override
-    public List<ColumnData> getRecordWithMetadata(
-            JdbcTemplate jdbcTemplate,
-            String tableName,
-            Object idValue
-    ) throws SQLException {
+    public List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
         List<ColumnData> result = new ArrayList<>();
 
-        try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
+        try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
             List<String> primaryKeys = new ArrayList<>();
-            try (ResultSet pkRs = metaData.getPrimaryKeys(null, null, tableName)) {
+            try (ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase())) {
                 while (pkRs.next()) {
                     primaryKeys.add(pkRs.getString("COLUMN_NAME"));
                 }
@@ -273,7 +269,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
 
             String idColumn = primaryKeys.get(0);
 
-            ResultSet columns = metaData.getColumns(null, null, tableName, null);
+            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), idColumn);
             List<String> columnNames = new ArrayList<>();
             Map<String, ColumnData> metaMap = new HashMap<>();
 
@@ -305,7 +301,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                         " FROM " + tableName +
                         " WHERE " + idColumn + " = ?";
 
-                Map<String, Object> row = jdbcTemplate.queryForMap(sql, idValue);
+                Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
                 for (String colName : batch) {
                     if (metaMap.containsKey(colName)) {
                         ColumnData col = metaMap.get(colName);
@@ -320,6 +316,39 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
         }
 
         return result;
+    }
+
+    @Override
+    public String getPrimaryKeyLabel(String tableName) throws SQLException {
+        try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+
+            // Lấy danh sách khóa chính
+            List<String> primaryKeys = new ArrayList<>();
+            try (ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase())) {
+                while (pkRs.next()) {
+                    primaryKeys.add(pkRs.getString("COLUMN_NAME"));
+                }
+            }
+
+            if (primaryKeys.isEmpty()) {
+                throw new SQLException("Table " + tableName + " does not have a primary key.");
+            }
+            if (primaryKeys.size() > 1) {
+                throw new SQLException("Table " + tableName + " has multiple primary keys (composite PK not supported).");
+            }
+
+            String pkColumn = primaryKeys.get(0);
+
+            // Lấy thông tin cột để truy vấn label/title
+            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), pkColumn);
+            if (columns.next()) {
+                String remarks = columns.getString("REMARKS"); // Nếu bạn dùng REMARKS làm label
+                return remarks != null ? remarks : pkColumn;    // fallback là tên cột
+            } else {
+                return pkColumn;
+            }
+        }
     }
 
     private JdbcTemplate jdbcTemplate() {

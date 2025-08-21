@@ -18,8 +18,8 @@ public class TableMetadataExtractor {
         try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
-            ResultSet columns = metaData.getColumns(null, null, tableName, null);
-            ResultSet pkRs = metaData.getPrimaryKeys(null, null, tableName);
+            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), null);
+            ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase());
 
             List<String> primaryKeys = new ArrayList<>();
             while (pkRs.next()) {

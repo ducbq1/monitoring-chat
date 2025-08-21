@@ -1,9 +1,11 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.ColumnData;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.repository.JdbcRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -77,5 +79,15 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     @Override
     public DatabaseDTO getDatabaseInfo() {
         return repository.getDatabaseInfo();
+    }
+
+    @Override
+    public List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
+        return repository.getRecordWithMetadata(tableName, idValue);
+    }
+
+    @Override
+    public String getPrimaryKeyLabel(String tableName) throws SQLException {
+        return repository.getPrimaryKeyLabel(tableName);
     }
 }

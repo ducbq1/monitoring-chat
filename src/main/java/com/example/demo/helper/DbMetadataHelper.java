@@ -44,7 +44,7 @@ public class DbMetadataHelper {
 
         try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
-            ResultSet rs = metaData.getPrimaryKeys(conn.getCatalog(), null, tableName.toUpperCase());
+            ResultSet rs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase());
 
             while (rs.next()) {
                 String pkColumn = rs.getString("COLUMN_NAME");
@@ -63,7 +63,7 @@ public class DbMetadataHelper {
         try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
-            ResultSet rs = metaData.getPrimaryKeys(conn.getCatalog(), null, tableName.toUpperCase());
+            ResultSet rs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase());
 
             List<String> pks = new ArrayList<>();
             while (rs.next()) {
@@ -128,7 +128,7 @@ public class DbMetadataHelper {
                 }
             }
 
-            rs = metaData.getPrimaryKeys(null, null, tableName.toUpperCase());
+            rs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase());
             while (rs.next()) {
                 String pkColumn = rs.getString("COLUMN_NAME");
                 if (pkColumn.equalsIgnoreCase(columnName)) {

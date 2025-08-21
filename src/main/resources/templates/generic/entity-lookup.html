@@ -1,0 +1,34 @@
+<section th:fragment="content">
+    <div class="container mt-4">
+        <h3 th:text="${metadata.name} + ' Lookup'">Entity Lookup</h3>
+
+        <!-- Form nhập primary key -->
+        <form th:action="@{/admin/generic/inquiry/{entity}(entity=${entity})}" method="post" class="mb-3">
+            <div class="mb-3">
+                <label for="primaryKey" class="form-label" th:text="${primaryKeyLabel}">Primary Key</label>
+                <input type="text" id="primaryKey" name="primaryKeyValue"
+                       th:value="${primaryKeyValue}" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </form>
+
+        <!-- Hiển thị danh sách ColumnData nếu có -->
+        <div th:if="${columns != null}">
+            <h5>Kết quả</h5>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Column Title</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="col : ${columns}">
+                    <td th:text="${col.columnName}">Column Name</td>
+                    <td th:text="${col.value}">Value</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

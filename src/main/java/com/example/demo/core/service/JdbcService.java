@@ -1,8 +1,10 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.ColumnData;
 import com.example.demo.core.model.DatabaseDTO;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +34,8 @@ public interface JdbcService<T extends BaseEntity> {
     int count(Map<String, Object> filters);
 
     DatabaseDTO getDatabaseInfo();
+
+    List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException;
+
+    String getPrimaryKeyLabel(String tableName) throws SQLException;
 }

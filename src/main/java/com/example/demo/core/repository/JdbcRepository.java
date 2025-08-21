@@ -38,9 +38,7 @@ public interface JdbcRepository<T extends BaseEntity> {
 
     DatabaseDTO getDatabaseInfo();
 
-    List<ColumnData> getRecordWithMetadata(
-            JdbcTemplate jdbcTemplate,
-            String tableName,
-            Object idValue
-    ) throws SQLException;
+    List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException;
+
+    String getPrimaryKeyLabel(String tableName) throws SQLException;
 }
