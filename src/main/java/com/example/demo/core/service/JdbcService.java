@@ -1,7 +1,7 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.model.ColumnData;
+import com.example.demo.core.model.ColumnDataDTO;
 import com.example.demo.core.model.DatabaseDTO;
 
 import java.sql.SQLException;
@@ -35,7 +35,9 @@ public interface JdbcService<T extends BaseEntity> {
 
     DatabaseDTO getDatabaseInfo();
 
-    List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException;
+    DatabaseDTO getDatabaseInfo(String tableName);
 
-    String getPrimaryKeyLabel(String tableName) throws SQLException;
+    List<ColumnDataDTO> getRecordWithMetadata(String tableName, Object idValue) throws SQLException;
+
+    List<ColumnDataDTO> getRecordWithMetadata(String tableName, String primaryKey, Object idValue) throws SQLException;
 }

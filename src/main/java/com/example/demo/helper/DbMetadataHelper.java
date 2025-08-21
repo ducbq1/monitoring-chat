@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DbMetadataHelper {
 
@@ -87,6 +88,46 @@ public class DbMetadataHelper {
             String databaseName = conn.getCatalog();
 
             return DatabaseDTO.of(databaseName, dbType, version, driver);
+        }
+    }
+
+    public static DatabaseDTO getDatabaseInfo(JdbcTemplate jdbcTemplate, String tableName) throws SQLException {
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        if (dataSource == null) throw new IllegalStateException("No datasource found");
+
+        try (Connection conn = dataSource.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+
+            String dbType = metaData.getDatabaseProductName();
+            String version = metaData.getDatabaseProductVersion();
+            String driver = metaData.getDriverName();
+            String databaseName = conn.getCatalog();
+
+            List<String> primaryKeys = new ArrayList<>();
+            try (ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase())) {
+                while (pkRs.next()) {
+                    primaryKeys.add(pkRs.getString("COLUMN_NAME"));
+                }
+            }
+
+            if (primaryKeys.isEmpty()) {
+                throw new SQLException("Table " + tableName + " does not have a primary key.");
+            }
+            if (primaryKeys.size() > 1) {
+                throw new SQLException("Table " + tableName + " has multiple primary keys (composite PK not supported).");
+            }
+
+            String pkColumn = primaryKeys.get(0);
+
+            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), pkColumn);
+            if (columns.next()) {
+                String remarks = columns.getString("REMARKS");
+                if (Objects.nonNull(remarks)) {
+                    pkColumn = remarks;
+                }
+            }
+
+            return DatabaseDTO.of(databaseName, dbType, version, driver, pkColumn);
         }
     }
 

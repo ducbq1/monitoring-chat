@@ -1,34 +1,159 @@
-<section th:fragment="content">
-    <div class="container mt-4">
-        <h3 th:text="${metadata.name} + ' Lookup'">Entity Lookup</h3>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<head>
+    <title th:text="${table.metadata.title} + ' Lookup'">Entity Lookup</title>
+    <style>
+        .section-title {
+            margin-bottom: 16px;
+        }
+        .section-title .db-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .section-title .database-name {
+            font-size: 0.9rem;
+            color: #4b5563;
+            background: #f9fafb;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        thead {
+            background: cornflowerblue;
+            color: white;
+        }
+        th, td {
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tbody tr:hover {
+            background: #e9ecef;
+        }
 
-        <!-- Form nhập primary key -->
-        <form th:action="@{/admin/generic/inquiry/{entity}(entity=${entity})}" method="post" class="mb-3">
-            <div class="mb-3">
-                <label for="primaryKey" class="form-label" th:text="${primaryKeyLabel}">Primary Key</label>
-                <input type="text" id="primaryKey" name="primaryKeyValue"
-                       th:value="${primaryKeyValue}" class="form-control"/>
-            </div>
-            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-        </form>
+        .badge-status {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 0.35rem;
+            display: inline-block;
+            font-weight: 500;
+        }
 
-        <!-- Hiển thị danh sách ColumnData nếu có -->
-        <div th:if="${columns != null}">
-            <h5>Kết quả</h5>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>Column Title</th>
-                    <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="col : ${columns}">
-                    <td th:text="${col.columnName}">Column Name</td>
-                    <td th:text="${col.value}">Value</td>
-                </tr>
-                </tbody>
-            </table>
+        .status-ok {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-down {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        .lookup-form {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .lookup-form label {
+            font-weight: 500;
+        }
+        .lookup-form input {
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .lookup-form button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 0.35rem;
+            background: #1677ff;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<section class="container-fluid">
+    <div class="section-title">
+        <div class="db-title" th:text="${table.metadata.title}">Entity Title</div>
+        <div class="database-name">
+            <span th:text="${table.metadata.database.name}">db_name</span>
+            (<span th:text="${table.metadata.table}">table_name</span>,
+            <span th:text="${table.metadata.database.dbType}">dbType</span>,
+            <span th:text="${table.metadata.database.version}">version</span>,
+            <span th:text="${table.metadata.database.driver}">driver</span>)
         </div>
     </div>
+
+    <!-- Form nhập khóa chính -->
+    <form class="lookup-form" th:action="@{'/admin/generic/inquiry/' + ${table.metadata.table}}" method="post">
+        <label th:text="'Lookup by ' + ${table.metadata.database.primaryKey} + ':'">Primary Key</label>
+        <input type="text" name="primaryKeyValue" th:value="${primaryKeyValue}" required/>
+        <button type="submit">Lookup</button>
+    </form>
+
+    <!-- Table -->
+    <div class="ant-table">
+        <table>
+            <thead>
+            <tr>
+                <th class="stt-col">STT</th>
+                <th th:each="col : ${table.columns}" th:text="${col['title']}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record, iterStat : ${table.records}">
+                <td class="stt-col" th:text="${iterStat.index + 1}"></td>
+                <td th:each="col : ${table.columns}">
+                        <span th:switch="${col['type']}">
+
+                            <!-- Date -->
+                            <span th:case="'date'"
+                                  th:text="${#temporals.format(@fieldUtil.get(record, col['field']), 'dd/MM/yyyy')}"></span>
+
+                            <!-- DateTime -->
+                            <span th:case="'datetime'"
+                                  th:text="${#temporals.format(@fieldUtil.get(record, col['field']), 'dd/MM/yyyy HH:mm')}"></span>
+
+                            <!-- Boolean -->
+                            <span th:case="'boolean'">
+                                <span th:if="${@fieldUtil.get(record, col['field'])}" class="badge-status status-ok">Yes</span>
+                                <span th:if="${!@fieldUtil.get(record, col['field'])}" class="badge-status status-down">No</span>
+                            </span>
+
+                            <!-- Number -->
+                            <span th:case="'number'"
+                                  th:text="${#numbers.formatDecimal(@fieldUtil.get(record, col['field']), 0, 'COMMA', 2, 'POINT')}"></span>
+
+                            <!-- Currency -->
+                            <span th:case="'currency'"
+                                  th:text="${'$' + #numbers.formatDecimal(@fieldUtil.get(record, col['field']), 0, 'COMMA', 2, 'POINT')}"></span>
+
+                            <!-- Default -->
+                            <span th:case="*"
+                                  th:text="${@fieldUtil.get(record, col['field'])}"></span>
+
+                        </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </section>
+</body>
+</html>

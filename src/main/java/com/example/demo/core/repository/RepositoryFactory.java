@@ -5,6 +5,7 @@ import com.example.demo.core.entity.BaseEntity;
 import com.example.demo.core.model.TableInfoDTO;
 import com.example.demo.helper.DbMetadataHelper;
 import com.example.demo.helper.FieldUtil;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
@@ -14,13 +15,15 @@ import java.util.function.Function;
 
 @Component
 public class RepositoryFactory {
+    private final ApplicationEventPublisher eventPublisher;
     private final DynamicDataSourceConfig dynamicDataSourceConfig;
     private final FieldUtil fieldUtil;
 
     private final Map<Class<?>, JdbcBaseRepository<?>> cache = new ConcurrentHashMap<>();
 
-    public RepositoryFactory(DynamicDataSourceConfig dynamicDataSourceConfig,
+    public RepositoryFactory(ApplicationEventPublisher eventPublisher, DynamicDataSourceConfig dynamicDataSourceConfig,
                              FieldUtil fieldUtil) {
+        this.eventPublisher = eventPublisher;
         this.dynamicDataSourceConfig = dynamicDataSourceConfig;
         this.fieldUtil = fieldUtil;
     }
@@ -33,7 +36,7 @@ public class RepositoryFactory {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            return new JdbcBaseRepository<>(clazz, dynamicDataSourceConfig, fieldUtil) {
+            return new JdbcBaseRepository<>(eventPublisher, clazz, dynamicDataSourceConfig, fieldUtil) {
             };
         }
         );

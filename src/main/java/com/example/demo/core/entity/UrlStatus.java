@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@Metadata(menu = "HealthCheck", title = "HealthCheck")
+@Metadata(menu = "HealthCheck", title = "HealthCheck", type = "inquiry")
 @Table(datasource = "h2", name = "url_status")
 public class UrlStatus extends BaseEntity {
 

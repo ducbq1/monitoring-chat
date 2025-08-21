@@ -140,8 +140,10 @@ public class FieldUtil {
                 col.put("type", "date");
             } else if (type == LocalDateTime.class || type == Date.class) {
                 col.put("type", "datetime");
-            } else {
+            } else if (type == String.class ||  type == String[].class) {
                 col.put("type", "text");
+            } else {
+                col.put("type", "object");
             }
             cols.add(col);
         }

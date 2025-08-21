@@ -3,17 +3,16 @@ package com.example.demo.core.repository;
 import com.example.demo.config.DynamicDataSourceConfig;
 import com.example.demo.core.annotation.Column;
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.listener.ErrorEvent;
 import com.example.demo.core.mapper.AnnotationBasedRowMapper;
 import com.example.demo.core.mapper.PagedRowMapper;
-import com.example.demo.core.model.ColumnData;
-import com.example.demo.core.model.DatabaseDTO;
-import com.example.demo.core.model.PrimaryKeyInfoDTO;
-import com.example.demo.core.model.TableInfoDTO;
+import com.example.demo.core.model.*;
 import com.example.demo.exception.AppException;
 import com.example.demo.helper.DbMetadataHelper;
 import com.example.demo.helper.FieldUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -24,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRepository<T> {
+    private final ApplicationEventPublisher eventPublisher;
     private static final Logger log = LoggerFactory.getLogger(JdbcBaseRepository.class);
     private final DynamicDataSourceConfig dynamicDataSourceConfig;
     private final Class<T> entityClass;
@@ -34,7 +34,8 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     private final String tableName;
     private final String primaryKey;
 
-    public JdbcBaseRepository(Class<T> entityClass, DynamicDataSourceConfig dynamicDataSourceConfig, FieldUtil fieldUtil) {
+    public JdbcBaseRepository(ApplicationEventPublisher eventPublisher, Class<T> entityClass, DynamicDataSourceConfig dynamicDataSourceConfig, FieldUtil fieldUtil) {
+        this.eventPublisher = eventPublisher;
         this.fieldUtil = fieldUtil;
         this.entityClass = entityClass;
 
@@ -251,8 +252,17 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     }
 
     @Override
-    public List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
-        List<ColumnData> result = new ArrayList<>();
+    public DatabaseDTO getDatabaseInfo(String tableName) {
+        try {
+            return DbMetadataHelper.getDatabaseInfo(jdbcTemplate(), tableName);
+        } catch (SQLException e) {
+            return DatabaseDTO.of(tableInfo.datasource());
+        }
+    }
+
+    @Override
+    public List<ColumnDataDTO> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
+        List<ColumnDataDTO> result = new ArrayList<>();
 
         try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
@@ -273,9 +283,9 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
 
             String idColumn = primaryKeys.get(0);
 
-            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), idColumn);
+            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), null);
             List<String> columnNames = new ArrayList<>();
-            Map<String, ColumnData> metaMap = new HashMap<>();
+            Map<String, ColumnDataDTO> metaMap = new HashMap<>();
 
             while (columns.next()) {
                 String columnName = columns.getString("COLUMN_NAME");
@@ -285,7 +295,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                 String remarks = columns.getString("REMARKS");
                 String defaultValue = columns.getString("COLUMN_DEF");
 
-                ColumnData col = new ColumnData();
+                ColumnDataDTO col = new ColumnDataDTO();
                 col.setColumnName(columnName);
                 col.setTypeName(typeName);
                 col.setSize(size);
@@ -309,7 +319,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                     Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
                     for (String colName : batch) {
                         if (metaMap.containsKey(colName)) {
-                            ColumnData col = metaMap.get(colName);
+                            ColumnDataDTO col = metaMap.get(colName);
                             col.setValue(row.get(colName));
                         }
                     }
@@ -327,36 +337,64 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     }
 
     @Override
-    public String getPrimaryKeyLabel(String tableName) throws SQLException {
+    public List<ColumnDataDTO> getRecordWithMetadata(String tableName, String primaryKey, Object idValue) throws SQLException {
+        List<ColumnDataDTO> result = new ArrayList<>();
+
         try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
-            // Lấy danh sách khóa chính
-            List<String> primaryKeys = new ArrayList<>();
-            try (ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase())) {
-                while (pkRs.next()) {
-                    primaryKeys.add(pkRs.getString("COLUMN_NAME"));
+            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), null);
+            List<String> columnNames = new ArrayList<>();
+            Map<String, ColumnDataDTO> metaMap = new HashMap<>();
+
+            while (columns.next()) {
+                String columnName = columns.getString("COLUMN_NAME");
+                String typeName = columns.getString("TYPE_NAME");
+                int size = columns.getInt("COLUMN_SIZE");
+                int nullable = columns.getInt("NULLABLE");
+                String remarks = columns.getString("REMARKS");
+                String defaultValue = columns.getString("COLUMN_DEF");
+
+                ColumnDataDTO col = new ColumnDataDTO();
+                col.setColumnName(columnName);
+                col.setTypeName(typeName);
+                col.setSize(size);
+                col.setNullable(nullable == DatabaseMetaData.columnNullable);
+                col.setRemarks(remarks);
+                col.setDefaultValue(defaultValue);
+                col.setPrimaryKey(primaryKey.contains(columnName));
+
+                columnNames.add(columnName);
+                metaMap.put(columnName, col);
+            }
+
+            int batchSize = 30;
+            for (int i = 0; i < columnNames.size(); i += batchSize) {
+                List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
+                String sql = "SELECT " + String.join(", ", batch) +
+                        " FROM " + tableName +
+                        " WHERE " + primaryKey + " = ?";
+
+                try {
+                    Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
+                    for (String colName : batch) {
+                        if (metaMap.containsKey(colName)) {
+                            ColumnDataDTO col = metaMap.get(colName);
+                            col.setValue(row.get(colName));
+                        }
+                    }
+                } catch (DataAccessException e){
+                    log.error(e.getMessage(), e);
+                    eventPublisher.publishEvent(new ErrorEvent(this, "No Data Available", "There are no records to display at the moment."));
                 }
             }
 
-            if (primaryKeys.isEmpty()) {
-                throw new SQLException("Table " + tableName + " does not have a primary key.");
-            }
-            if (primaryKeys.size() > 1) {
-                throw new SQLException("Table " + tableName + " has multiple primary keys (composite PK not supported).");
-            }
-
-            String pkColumn = primaryKeys.get(0);
-
-            // Lấy thông tin cột để truy vấn label/title
-            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), pkColumn);
-            if (columns.next()) {
-                String remarks = columns.getString("REMARKS"); // Nếu bạn dùng REMARKS làm label
-                return remarks != null ? remarks : pkColumn;    // fallback là tên cột
-            } else {
-                return pkColumn;
+            for (String colName : columnNames) {
+                result.add(metaMap.get(colName));
             }
         }
+
+        return result;
     }
 
     private JdbcTemplate jdbcTemplate() {

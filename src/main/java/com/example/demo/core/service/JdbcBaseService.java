@@ -1,7 +1,7 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.model.ColumnData;
+import com.example.demo.core.model.ColumnDataDTO;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.repository.JdbcRepository;
 
@@ -82,12 +82,17 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     }
 
     @Override
-    public List<ColumnData> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
+    public DatabaseDTO getDatabaseInfo(String tableName) {
+        return repository.getDatabaseInfo(tableName);
+    }
+
+    @Override
+    public List<ColumnDataDTO> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
         return repository.getRecordWithMetadata(tableName, idValue);
     }
 
     @Override
-    public String getPrimaryKeyLabel(String tableName) throws SQLException {
-        return repository.getPrimaryKeyLabel(tableName);
+    public List<ColumnDataDTO> getRecordWithMetadata(String tableName, String primaryKey, Object idValue) throws SQLException {
+        return repository.getRecordWithMetadata(tableName, primaryKey, idValue);
     }
 }
