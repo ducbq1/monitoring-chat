@@ -11,6 +11,6 @@ public @interface Metadata {
     String menu();
     String title();
     String icon() default "bi bi-code-slash me-2";
-    String[] roles() default "";
+    String[] roles() default {};
     String type() default "list";
 }

@@ -23,12 +23,12 @@ public class MetaDataDTO {
         this.table = builder.table;
     }
 
-    public Map<String, Object> toMap(String type) throws IllegalAccessException {
+    public Map<String, Object> toMap() throws IllegalAccessException {
         Map<String, Object> map = new HashMap<>();
         for (Field field : getClass().getDeclaredFields()) {
             map.put(field.getName(), field.get(this));
         }
-        map.put("href", "/admin/generic/" + (type.isEmpty() ? this.type : type) + "/" + table);
+        map.put("href", "/admin/generic/" + type + "/" + table);
         return map;
     }
 

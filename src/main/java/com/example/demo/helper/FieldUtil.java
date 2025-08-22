@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -74,9 +75,12 @@ public class FieldUtil {
         }
 
         String strVal = value.toString();
-
-        if (targetType == Long.class || targetType == long.class) {
+        if (targetType == BigDecimal.class) {
+            return BigDecimal.valueOf(Long.parseLong(strVal));
+        } else if (targetType == Long.class || targetType == long.class) {
             return Long.parseLong(strVal);
+        } else if (targetType == Double.class || targetType == double.class) {
+            return Double.parseDouble(strVal);
         } else if (targetType == Integer.class || targetType == int.class) {
             return Integer.parseInt(strVal);
         } else if (targetType == String.class) {
@@ -98,7 +102,8 @@ public class FieldUtil {
         T record = null;
         try {
             record = clazz.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
         return record;
@@ -117,11 +122,11 @@ public class FieldUtil {
     }
 
 
-    public List<Map<String,Object>> getColumns(Class<?> clazz) {
+    public List<Map<String, Object>> getColumns(Class<?> clazz) {
         Field[] fields = clazz.getDeclaredFields();
-        List<Map<String,Object>> cols = new ArrayList<>();
-        for(Field f : fields){
-            Map<String,Object> col = new HashMap<>();
+        List<Map<String, Object>> cols = new ArrayList<>();
+        for (Field f : fields) {
+            Map<String, Object> col = new HashMap<>();
             Column c = f.getAnnotation(Column.class);
             col.put("column", c != null && !c.name().isBlank() ? c.name() : f.getName());
             col.put("field", f.getName());
@@ -129,7 +134,9 @@ public class FieldUtil {
             col.put("required", c != null && c.required());
             col.put("readonly", c != null && c.readonly());
             Class<?> type = f.getType();
-            if (type == Boolean.class || type == boolean.class) {
+            if (c != null && !c.type().getType().isEmpty()) {
+                col.put("type", c.type().getType());
+            } else if (type == Boolean.class || type == boolean.class) {
                 col.put("type", "boolean");
             } else if (type == Integer.class || type == int.class
                     || type == Long.class || type == long.class
@@ -140,7 +147,7 @@ public class FieldUtil {
                 col.put("type", "date");
             } else if (type == LocalDateTime.class || type == Date.class) {
                 col.put("type", "datetime");
-            } else if (type == String.class ||  type == String[].class) {
+            } else if (type == String.class || type == String[].class) {
                 col.put("type", "text");
             } else {
                 col.put("type", "object");
@@ -155,7 +162,7 @@ public class FieldUtil {
             Field f = entity.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
             return f.get(entity);
-        } catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
@@ -204,7 +211,7 @@ public class FieldUtil {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
                 Column colAnno = field.getAnnotation(Column.class);
-                String name =  (colAnno != null && !colAnno.name().isEmpty())
+                String name = (colAnno != null && !colAnno.name().isEmpty())
                         ? colAnno.name()
                         : field.getName();
                 return PrimaryKeyInfoDTO.of(name, primaryKey.sequence());

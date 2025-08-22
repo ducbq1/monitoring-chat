@@ -1,13 +1,14 @@
-package com.example.demo.core.entity;
+package com.example.demo.core.entity.normal;
 
 import com.example.demo.core.annotation.*;
+import com.example.demo.core.entity.BaseEntity;
 
-@Metadata(menu = "Cấu hình tham số", title = "Cấu hình tham số")
+@Metadata(menu = "Cấu hình tham số", title = "Cấu hình tham số", roles = {"admin", "supervisor"})
 @Table(datasource = "touchpoint", name = "global_defaults")
 public class GlobalDefault extends BaseEntity {
 
     @PrimaryKey
-    @Column(name = "name", title = "Tên khóa")
+    @Column(name = "name", title = "Tên khóa", type = ColumnType.TEXT)
     private String name;
 
     @Column(name = "value", title = "Giá trị")

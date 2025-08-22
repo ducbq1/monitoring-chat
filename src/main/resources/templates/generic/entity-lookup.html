@@ -4,23 +4,42 @@
     <title th:text="${table.metadata.title} + ' Lookup'">Entity Lookup</title>
     <style>
         .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1677ff;
             margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
         }
+
         .section-title .db-title {
             font-size: 1.4rem;
             font-weight: 600;
-            color: #1f2937;
+            color: #1f2937; /* text-gray-800 */
         }
+
         .section-title .database-name {
-            font-size: 0.9rem;
-            color: #4b5563;
-            background: #f9fafb;
+            margin-top: 2px;
+            font-size: 0.95rem;
+            color: #4b5563; /* text-gray-600 */
+            background: #f9fafb; /* bg-gray-50 */
             padding: 4px 8px;
             border-radius: 6px;
-            border: 1px solid #e5e7eb;
-            margin-top: 4px;
             display: inline-block;
+            border: 1px solid #e5e7eb; /* subtle border */
         }
+
+        .section-title .database-name span:first-child {
+            font-weight: 500;
+            color: #111827; /* darker text for db name */
+        }
+
+        .section-title .database-name span:not(:first-child) {
+            color: #6b7280; /* lighter for dbType, version, driver */
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;

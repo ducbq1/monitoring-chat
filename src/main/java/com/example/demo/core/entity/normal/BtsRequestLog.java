@@ -1,15 +1,16 @@
-package com.example.demo.core.entity;
+package com.example.demo.core.entity.normal;
 
 import com.example.demo.core.annotation.*;
+import com.example.demo.core.entity.BaseEntity;
 
 import java.time.LocalDateTime;
 
-@Metadata(menu = "Nhật ký thao tác", title = "Nhật ký thao tác", type = "inquiry")
-@Table(datasource = "h2", name = "bts_request_log")
-public class RequestLog extends BaseEntity {
+@Metadata(menu = "Nhật ký thao tác BTS", title = "Nhật ký thao tác BTS")
+@Table(datasource = "infrastructure", name = "request_log")
+public class BtsRequestLog extends BaseEntity {
 
     @PrimaryKey
-    @Column(name = "id", title = "ID")
+    @Column(name = "id", title = "ID", type = ColumnType.TEXT)
     private Long id;
 
     @Column(name = "created_at", title = "Ngày tạo")

@@ -1,7 +1,6 @@
 package com.example.demo.core.controller;
 
-import com.example.demo.core.entity.RequestLog;
-import com.example.demo.core.entity.UrlStatus;
+import com.example.demo.core.entity.inquiry.UrlStatus;
 import com.example.demo.core.service.ServiceFactory;
 import com.example.demo.helper.FieldUtil;
 import org.springframework.stereotype.Controller;

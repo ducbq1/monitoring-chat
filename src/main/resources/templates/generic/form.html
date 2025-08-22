@@ -46,7 +46,7 @@
         }
 
         .btn {
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 0.35rem;
             border: none;
             cursor: pointer;
@@ -62,10 +62,6 @@
         .btn-secondary {
             background: #6c757d;
             color: #fff;
-        }
-
-        .btn + .btn {
-            margin-left: 8px;
         }
 
         .form-actions {
@@ -85,15 +81,20 @@
     <div th:each="col : ${columns}">
         <label th:for="${col['field']}" th:text="${col['title']}"></label>
         <div th:switch="${col['type']}">
-            <input th:case="'datetime'" type="datetime-local"
-                   th:name="${col['field']}" th:id="${col['field']}"
-                   th:value="${#temporals.format(record[col['field']], 'yyyy-MM-dd''T''HH:mm')}"
-                   th:readonly="${col['readonly']}"
-                   th:required="${col['required']}" />
 
             <input th:case="'date'" type="date"
                    th:name="${col['field']}" th:id="${col['field']}"
-                   th:value="${#temporals.format(record[col['field']], 'yyyy-MM-dd')}"
+                   th:value="${record[col['field']] != null
+                      ? #temporals.format(record[col['field']], 'yyyy-MM-dd')
+                      : #dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                   th:readonly="${col['readonly']}"
+                   th:required="${col['required']}" />
+
+            <input th:case="'datetime'" type="datetime-local"
+                   th:name="${col['field']}" th:id="${col['field']}"
+                   th:value="${record[col['field']] != null
+                      ? #temporals.format(record[col['field']], 'yyyy-MM-dd''T''HH:mm')
+                      : #dates.format(#dates.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
                    th:readonly="${col['readonly']}"
                    th:required="${col['required']}" />
 
@@ -116,7 +117,7 @@
 
     </div>
 
-    <div style="display:flex; gap:8px;">
+    <div class="mt-1 d-flex gap-2">
         <button type="submit" class="btn btn-primary">Save</button>
         <a th:href="${listUri}" class="btn btn-secondary">Cancel</a>
     </div>

@@ -9,6 +9,8 @@ public class ErrorHolder {
     private String title;
     private String message;
 
+    
+
     public void setError(String title, String message) {
         this.title = title;
         this.message = message;

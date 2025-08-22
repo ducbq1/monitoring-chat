@@ -1,13 +1,11 @@
 package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.entity.GlobalDefault;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.model.MessageDTO;
 import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
 import com.example.demo.core.repository.EntityRegistry;
-import com.example.demo.core.repository.RepositoryFactory;
 import com.example.demo.core.repository.ViewContext;
 import com.example.demo.core.service.JdbcService;
 import com.example.demo.core.service.ServiceFactory;
@@ -24,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -141,6 +140,14 @@ public class GenericEntityController {
                 return type.cast(value);
             }
         }, LocalDateTime.class);
+
+        ConvertUtils.register(new Converter() {
+            @Override
+            public Object convert(Class type, Object value) {
+                if (value == null || "".equals(value)) return null;
+                return new BigDecimal(value.toString());
+            }
+        }, BigDecimal.class);
 
         BeanUtils.populate(record, request.getParameterMap());
 

@@ -44,7 +44,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
 
         this.tableName = tableInfo.name();
         this.primaryKey = primaryKeyInfo.name();
-        
+
         this.dynamicDataSourceConfig = dynamicDataSourceConfig;
     }
 
@@ -117,7 +117,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                 sql.toString(),
                 new PagedRowMapper<>(new AnnotationBasedRowMapper<>(entityClass), page * limit, limit),
                 params.toArray()
-                ).stream().filter(Objects::nonNull).toList();
+        ).stream().filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -323,7 +323,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                             col.setValue(row.get(colName));
                         }
                     }
-                } catch (DataAccessException e){
+                } catch (DataAccessException e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -369,23 +369,25 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
             }
 
             int batchSize = 30;
-            for (int i = 0; i < columnNames.size(); i += batchSize) {
-                List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
-                String sql = "SELECT " + String.join(", ", batch) +
-                        " FROM " + tableName +
-                        " WHERE " + primaryKey + " = ?";
+            if (Objects.nonNull(idValue)) {
+                for (int i = 0; i < columnNames.size(); i += batchSize) {
+                    List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
+                    String sql = "SELECT " + String.join(", ", batch) +
+                            " FROM " + tableName +
+                            " WHERE " + primaryKey + " = ?";
 
-                try {
-                    Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
-                    for (String colName : batch) {
-                        if (metaMap.containsKey(colName)) {
-                            ColumnDataDTO col = metaMap.get(colName);
-                            col.setValue(row.get(colName));
+                    try {
+                        Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
+                        for (String colName : batch) {
+                            if (metaMap.containsKey(colName)) {
+                                ColumnDataDTO col = metaMap.get(colName);
+                                col.setValue(row.get(colName));
+                            }
                         }
+                    } catch (DataAccessException e) {
+                        log.error(e.getMessage(), e);
+                        eventPublisher.publishEvent(new ErrorEvent(this, "No Data Available", "There are no records to display at the moment."));
                     }
-                } catch (DataAccessException e){
-                    log.error(e.getMessage(), e);
-                    eventPublisher.publishEvent(new ErrorEvent(this, "No Data Available", "There are no records to display at the moment."));
                 }
             }
 

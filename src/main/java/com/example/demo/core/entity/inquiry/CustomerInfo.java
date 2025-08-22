@@ -1,6 +1,7 @@
-package com.example.demo.core.entity;
+package com.example.demo.core.entity.inquiry;
 
 import com.example.demo.core.annotation.*;
+import com.example.demo.core.entity.BaseEntity;
 
 @Metadata(menu = "Hồ sơ thông tin khách hàng", title = "Hồ sơ thông tin khách hàng", type = "inquiry")
 @Table(datasource = "profile", name = "CIF")
@@ -9,7 +10,6 @@ public class CustomerInfo extends BaseEntity {
     @PrimaryKey
     @Column(name = "name", title = "Tên khóa")
     private String name;
-
     @Column(name = "value", title = "Giá trị")
     private String value;
 

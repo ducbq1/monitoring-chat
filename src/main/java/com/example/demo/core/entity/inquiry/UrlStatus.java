@@ -1,7 +1,7 @@
-package com.example.demo.core.entity;
+package com.example.demo.core.entity.inquiry;
 
 import com.example.demo.core.annotation.*;
-import org.springframework.format.annotation.DateTimeFormat;
+import com.example.demo.core.entity.BaseEntity;
 
 import java.time.LocalDateTime;
 

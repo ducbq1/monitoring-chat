@@ -23,9 +23,10 @@ public class GlobalSidebar {
             try {
                 MetaDataDTO metaData = MetadataValidator.extractMetaData(clazz);
                 if (metaData.getType().equalsIgnoreCase("inquiry")) {
-                    inquirySidebarMenu.add(metaData.toMap(""));
+                    inquirySidebarMenu.add(metaData.toMap());
+                } else {
+                    sidebarMenu.add(metaData.toMap());
                 }
-                sidebarMenu.add(metaData.toMap("list"));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

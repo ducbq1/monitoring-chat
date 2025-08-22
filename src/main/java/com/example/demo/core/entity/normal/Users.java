@@ -1,6 +1,7 @@
-package com.example.demo.core.entity;
+package com.example.demo.core.entity.normal;
 
 import com.example.demo.core.annotation.*;
+import com.example.demo.core.entity.BaseEntity;
 
 import java.math.BigDecimal;
 
@@ -9,7 +10,7 @@ import java.math.BigDecimal;
 public class Users extends BaseEntity {
 
     @PrimaryKey
-    @Column(name = "id", title = "Mã")
+    @Column(name = "id", title = "Mã", type = ColumnType.TEXT)
     private BigDecimal id;
 
     @Column(name = "username", title = "Tên")

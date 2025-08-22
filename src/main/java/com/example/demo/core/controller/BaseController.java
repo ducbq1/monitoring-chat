@@ -1,20 +1,16 @@
 package com.example.demo.core.controller;
 
 import com.example.demo.core.entity.BaseEntity;
-import com.example.demo.core.entity.GlobalDefault;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.model.MetaDataDTO;
 import com.example.demo.core.model.TablePageDTO;
-import com.example.demo.core.repository.RepositoryFactory;
 import com.example.demo.core.service.JdbcService;
 import com.example.demo.core.service.ServiceFactory;
-import com.example.demo.helper.DbMetadataHelper;
 import com.example.demo.helper.FieldUtil;
 import com.example.demo.helper.ViewHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;

@@ -1,7 +1,6 @@
 package com.example.demo.core.controller;
 
-import com.example.demo.core.entity.GlobalDefault;
-import com.example.demo.core.service.JdbcService;
+import com.example.demo.core.entity.normal.GlobalDefault;
 import com.example.demo.core.service.ServiceFactory;
 import com.example.demo.helper.FieldUtil;
 import org.springframework.web.bind.annotation.*;
