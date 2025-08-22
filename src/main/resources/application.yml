@@ -21,10 +21,10 @@ custom:
       password: ${INFRA_DB_PASSWORD:mypassword}
       driver-class-name: ${INFRA_DB_DRIVER:org.postgresql.Driver}
     touchpoint:
-      url: ${TP_DB_URL:jdbc:postgresql://localhost:5432/mydb}
-      username: ${TP_DB_USERNAME:myuser}
-      password: ${TP_DB_PASSWORD:mypassword}
-      driver-class-name: ${TP_DB_DRIVER:org.postgresql.Driver}
+      url: ${TP_DB_URL:jdbc:oracle:thin:@localhost:1521:xe}
+      username: ${TP_DB_USERNAME:oracle_user}
+      password: ${TP_DB_PASSWORD:secret}
+      driver-class-name: ${TP_DB_DRIVER:oracle.jdbc.OracleDriver}
     derby:
       url: ${DERBY_DB_URL:jdbc:derby:memory:mydb;create=true}
       username: ${DERBY_DB_USERNAME:}
