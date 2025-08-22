@@ -35,31 +35,35 @@ public class EntityLookupController extends EntityLookupBaseController {
         this.fieldUtil = fieldUtil;
     }
 
-    @GetMapping("/{entity}")
-    public String showLookupForm(Model model, @PathVariable String entity) throws SQLException {
-        return buildLookupPage(model, entity, null);
+    @GetMapping("/{datasource}/{entity}")
+    public String showLookupForm(Model model,
+                                 @PathVariable String datasource,
+                                 @PathVariable String entity) throws SQLException {
+        return buildLookupPage(model, datasource, entity, null);
     }
 
-    @PostMapping("/{entity}")
-    public String lookupRecord(@PathVariable String entity,
+    @PostMapping("/{datasource}/{entity}")
+    public String lookupRecord(@PathVariable String datasource,
+                               @PathVariable String entity,
                                @RequestParam("primaryKeyValue") String primaryKeyValue,
                                Model model) throws SQLException {
-        return buildLookupPage(model, entity, primaryKeyValue);
+        return buildLookupPage(model, datasource, entity, primaryKeyValue);
     }
 
-    private String buildLookupPage(Model model, String entity, String primaryKeyValue) throws SQLException {
-        Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
+    private String buildLookupPage(Model model, String datasource, String entity, String primaryKeyValue) throws SQLException {
+        Class<? extends BaseEntity> clazz = EntityRegistry.get("inquiry", datasource, entity);
         if (clazz == null) return "redirect:/admin";
 
         MetaDataDTO metadata = fieldUtil.getMetadata(clazz);
         JdbcService jdbcService = serviceFactory.getService(clazz);
 
-        DatabaseDTO database = jdbcService.getDatabaseInfo(entity);
+        DatabaseDTO database = jdbcService.getDatabaseInfo(entity, object -> metadata.setPrimaryKey(object.toString()));
+        database.setName(datasource);
         metadata.setDatabase(database);
 
         TablePageDTO<ColumnDataDTO> table = new TablePageDTO<ColumnDataDTO>().setMetadata(metadata);
 
-        List<ColumnDataDTO> records = jdbcService.getRecordWithMetadata(entity, database.getPrimaryKey(), primaryKeyValue);
+        List<ColumnDataDTO> records = jdbcService.getRecordWithMetadata(entity, metadata.getPrimaryKey(), primaryKeyValue);
         List<Map<String, Object>> columns = fieldUtil.getColumns(ColumnDataDTO.class);
         table.setColumns(columns).setRecords(records);
 

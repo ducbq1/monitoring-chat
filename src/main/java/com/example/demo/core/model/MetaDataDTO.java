@@ -11,6 +11,7 @@ public class MetaDataDTO {
     private DatabaseDTO database;
     private String table;
     private String type;
+    private String primaryKey;
 
     public MetaDataDTO() {
     }
@@ -21,6 +22,7 @@ public class MetaDataDTO {
         this.icon = builder.icon;
         this.database = builder.database;
         this.table = builder.table;
+        this.primaryKey = builder.primaryKey;
     }
 
     public Map<String, Object> toMap() throws IllegalAccessException {
@@ -28,7 +30,7 @@ public class MetaDataDTO {
         for (Field field : getClass().getDeclaredFields()) {
             map.put(field.getName(), field.get(this));
         }
-        map.put("href", "/admin/generic/" + type + "/" + table);
+        map.put("href", String.format("/admin/generic/%s/%s/%s", type, database.getName(), table));
         return map;
     }
 
@@ -80,6 +82,14 @@ public class MetaDataDTO {
         this.table = table;
     }
 
+    public String getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(String primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
     public Builder builder() {
         return new Builder();
     }
@@ -90,6 +100,7 @@ public class MetaDataDTO {
         private String icon;
         private DatabaseDTO database;
         private String table;
+        private String primaryKey;
 
         public Builder menu(String menu) {
             this.menu = menu;
@@ -113,6 +124,11 @@ public class MetaDataDTO {
 
         public Builder table(String table) {
             this.table = table;
+            return this;
+        }
+
+        public Builder primaryKey(String primaryKey) {
+            this.primaryKey = primaryKey;
             return this;
         }
 

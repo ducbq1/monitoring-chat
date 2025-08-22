@@ -27,12 +27,12 @@ public class CheckError {
         this.healthCheckService = healthCheckService;
     }
 
-    @Scheduled(fixedRate = 30 * 1000)
+    @Scheduled(fixedRate = 3 * 60 * 1000)
     public void check() {
         healthCheckService.checkAll();
     }
 
-    @Scheduled(fixedRate = 30 * 1000) // mỗi 30s
+    @Scheduled(fixedRate = 3 * 60 * 1000)
     public void checkErrors() {
         List<UrlStatus> unreachable = urlStatusRepository.findAllByReachableFalse();
         List<FeignLog> feignErrors = feignLogRepository.findAll();

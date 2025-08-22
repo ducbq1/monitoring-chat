@@ -217,6 +217,16 @@ public class FieldUtil {
                 return PrimaryKeyInfoDTO.of(name, primaryKey.sequence());
             }
         }
-        throw new RuntimeException("No @PrimaryKey field found in " + clazz.getSimpleName());
+
+        if (clazz.isAnnotationPresent(Table.class)) {
+            Table tableAnno = clazz.getAnnotation(Table.class);
+            String pkName = tableAnno.primaryKey();
+            if (pkName != null && !pkName.isBlank()) {
+                return PrimaryKeyInfoDTO.of(pkName, "");
+            }
+        }
+
+        throw new RuntimeException("No @PrimaryKey field or table-level primary key found in " + clazz.getSimpleName());
     }
+
 }

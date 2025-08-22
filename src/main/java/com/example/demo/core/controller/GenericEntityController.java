@@ -41,14 +41,15 @@ public class GenericEntityController {
         this.fieldUtil = fieldUtil;
     }
 
-    @GetMapping("/{entity}")
+    @GetMapping("/{datasource}/{entity}")
     public String list(Model model,
+                       @PathVariable String datasource,
                        @PathVariable String entity,
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "5") int size,
                        HttpServletRequest request) {
         viewContext.setCurrentView(request.getRequestURI());
-        Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
+        Class<? extends BaseEntity> clazz = EntityRegistry.get(datasource, entity);
         if (clazz == null) return "redirect:/admin";
         MetaDataDTO metadata = fieldUtil.getMetadata(clazz);
 
@@ -95,22 +96,24 @@ public class GenericEntityController {
         return "layout";
     }
 
-    @GetMapping({"/{entity}/create", "/{entity}/edit/{id}"})
-    public String form(@PathVariable String entity,
+    @GetMapping({"/{datasource}/{entity}/create", "/{datasource}/{entity}/edit/{id}"})
+    public String form(@PathVariable String datasource,
+                       @PathVariable String entity,
                        @PathVariable(required = false) Object id,
                        Model model,
                        HttpServletRequest request) {
         viewContext.setCurrentView(request.getRequestURI());
-        Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
+        Class<? extends BaseEntity> clazz = EntityRegistry.get(datasource, entity);
         if (clazz == null) return "redirect:/admin";
         MetaDataDTO metadata = fieldUtil.getMetadata(clazz);
 
         JdbcService jdbcService = serviceFactory.getService(clazz);
         BaseEntity record = (id != null) ? jdbcService.findById(id) : fieldUtil.create(clazz);
 
-        String listUri = UriComponentsBuilder.fromPath("/admin/generic/list/{entity}")
-                .buildAndExpand(entity)
+        String listUri = UriComponentsBuilder.fromPath("/admin/generic/list/{datasource}/{entity}")
+                .buildAndExpand(datasource, entity)
                 .toUriString();
+
         model.addAttribute("listUri", listUri);
         model.addAttribute("record", record);
         model.addAttribute("columns", fieldUtil.getColumns(clazz));
@@ -119,13 +122,14 @@ public class GenericEntityController {
         return "layout";
     }
 
-    @PostMapping({"/{entity}/create", "/{entity}/edit/{id}"})
-    public String submit(@PathVariable String entity,
+    @PostMapping({"/{datasource}/{entity}/create", "/{datasource}/{entity}/edit/{id}"})
+    public String submit(@PathVariable String datasource,
+                         @PathVariable String entity,
                          @PathVariable(required = false) Object id,
                          RedirectAttributes redirectAttributes,
                          HttpServletRequest request) throws InvocationTargetException, IllegalAccessException {
         viewContext.setCurrentView(request.getRequestURI());
-        Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
+        Class<? extends BaseEntity> clazz = EntityRegistry.get(datasource, entity);
         if (clazz == null) return "redirect:/admin";
 
         BaseEntity record = fieldUtil.create(clazz);
@@ -161,17 +165,17 @@ public class GenericEntityController {
         }
 
         redirectAttributes.addFlashAttribute("message", MessageDTO.success("Thông báo", "Thao tác thành công"));
-        return "redirect:/admin/generic/list/" + entity;
+        return "redirect:/admin/generic/list/" + datasource + "/" + entity;
     }
 
-    @PostMapping("/{entity}/delete/{id}")
-    public String delete(@PathVariable String entity, @PathVariable Object id, RedirectAttributes redirectAttributes) {
-        Class<? extends BaseEntity> clazz = EntityRegistry.get(entity);
+    @PostMapping("/{datasource}/{entity}/delete/{id}")
+    public String delete(@PathVariable String datasource, @PathVariable String entity, @PathVariable Object id, RedirectAttributes redirectAttributes) {
+        Class<? extends BaseEntity> clazz = EntityRegistry.get(datasource, entity);
         if (clazz == null) return "redirect:/admin";
 
         JdbcService jdbcService = serviceFactory.getService(clazz);
         jdbcService.deleteById(id);
         redirectAttributes.addFlashAttribute("message", MessageDTO.success("Thông báo", "Thao tác thành công"));
-        return "redirect:/admin/generic/list/" + entity;
+        return "redirect:/admin/generic/list/" + datasource + "/" + entity;
     }
 }

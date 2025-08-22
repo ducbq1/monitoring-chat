@@ -1,6 +1,7 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.Callback;
 import com.example.demo.core.model.ColumnDataDTO;
 import com.example.demo.core.model.DatabaseDTO;
 import com.example.demo.core.repository.JdbcRepository;
@@ -82,8 +83,8 @@ public abstract class JdbcBaseService<T extends BaseEntity> implements JdbcServi
     }
 
     @Override
-    public DatabaseDTO getDatabaseInfo(String tableName) {
-        return repository.getDatabaseInfo(tableName);
+    public DatabaseDTO getDatabaseInfo(String tableName, Callback callback) {
+        return repository.getDatabaseInfo(tableName, callback);
     }
 
     @Override

@@ -252,9 +252,9 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     }
 
     @Override
-    public DatabaseDTO getDatabaseInfo(String tableName) {
+    public DatabaseDTO getDatabaseInfo(String tableName, Callback callback) {
         try {
-            return DbMetadataHelper.getDatabaseInfo(jdbcTemplate(), tableName);
+            return DbMetadataHelper.getDatabaseInfo(jdbcTemplate(), tableName, callback);
         } catch (SQLException e) {
             return DatabaseDTO.of(tableInfo.datasource());
         }
@@ -268,7 +268,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
             DatabaseMetaData metaData = conn.getMetaData();
 
             List<String> primaryKeys = new ArrayList<>();
-            try (ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase())) {
+            try (ResultSet pkRs = metaData.getPrimaryKeys(Objects.nonNull(conn.getCatalog()) ? conn.getCatalog() : null, Objects.nonNull(conn.getSchema()) ? conn.getSchema() : null, tableName.toUpperCase())) {
                 while (pkRs.next()) {
                     primaryKeys.add(pkRs.getString("COLUMN_NAME"));
                 }
@@ -283,7 +283,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
 
             String idColumn = primaryKeys.get(0);
 
-            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), null);
+            ResultSet columns = metaData.getColumns(Objects.nonNull(conn.getCatalog()) ? conn.getCatalog() : null, Objects.nonNull(conn.getSchema()) ? conn.getSchema() : null, tableName.toUpperCase(), null);
             List<String> columnNames = new ArrayList<>();
             Map<String, ColumnDataDTO> metaMap = new HashMap<>();
 
@@ -343,7 +343,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
         try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
-            ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), null);
+            ResultSet columns = metaData.getColumns(Objects.nonNull(conn.getCatalog()) ? conn.getCatalog() : null, Objects.nonNull(conn.getSchema()) ? conn.getSchema() : null, tableName.toUpperCase(), null);
             List<String> columnNames = new ArrayList<>();
             Map<String, ColumnDataDTO> metaMap = new HashMap<>();
 

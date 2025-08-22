@@ -39,6 +39,7 @@ public class MetadataValidator {
         }
         dto.setDatabase(DatabaseDTO.of(table.datasource()));
         dto.setTable(table.name());
+        dto.setPrimaryKey(table.primaryKey() != null && !table.primaryKey().isEmpty() ? table.primaryKey() : null);
 
         return dto;
     }

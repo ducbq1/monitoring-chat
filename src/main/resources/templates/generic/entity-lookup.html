@@ -111,7 +111,7 @@
     <div class="section-title">
         <div class="db-title" th:text="${table.metadata.title}">Entity Title</div>
         <div class="database-name">
-            <span th:text="${table.metadata.database.name}">db_name</span>
+            <span th:text="${table.metadata.database.catalog}">db_name</span>
             (<span th:text="${table.metadata.table}">table_name</span>,
             <span th:text="${table.metadata.database.dbType}">dbType</span>,
             <span th:text="${table.metadata.database.version}">version</span>,
@@ -120,8 +120,8 @@
     </div>
 
     <!-- Form nhập khóa chính -->
-    <form class="lookup-form" th:action="@{'/admin/generic/inquiry/' + ${table.metadata.table}}" method="post">
-        <label th:text="'Lookup by ' + ${table.metadata.database.primaryKey} + ':'">Primary Key</label>
+    <form class="lookup-form" th:action="@{'/admin/generic/inquiry/' + ${table.metadata.database.name} + '/' + ${table.metadata.table}}" method="post">
+        <label th:text="'Lookup by ' + ${table.metadata.primaryKey} + ':'">Primary Key</label>
         <input type="text" name="primaryKeyValue" th:value="${primaryKeyValue}" required/>
         <button type="submit">Lookup</button>
     </form>

@@ -1,6 +1,7 @@
 package com.example.demo.core.service;
 
 import com.example.demo.core.entity.BaseEntity;
+import com.example.demo.core.model.Callback;
 import com.example.demo.core.model.ColumnDataDTO;
 import com.example.demo.core.model.DatabaseDTO;
 
@@ -35,7 +36,7 @@ public interface JdbcService<T extends BaseEntity> {
 
     DatabaseDTO getDatabaseInfo();
 
-    DatabaseDTO getDatabaseInfo(String tableName);
+    DatabaseDTO getDatabaseInfo(String tableName, Callback callback);
 
     List<ColumnDataDTO> getRecordWithMetadata(String tableName, Object idValue) throws SQLException;
 

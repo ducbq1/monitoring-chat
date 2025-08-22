@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface Table {
     String datasource();
     String name();
+    String primaryKey() default "";
 }
