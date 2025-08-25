@@ -326,6 +326,7 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                 }
             } catch (DataAccessException e) {
                 log.error("No data found for table {} with {}={}: {}", tableName, idColumn, idValue, e.getMessage());
+                eventPublisher.publishEvent(new ErrorEvent(this, "No Data Available", "There are no records to display at the moment."));
             }
         }
 
