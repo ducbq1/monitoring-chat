@@ -17,6 +17,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
@@ -263,12 +264,17 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     @Override
     public List<ColumnDataDTO> getRecordWithMetadata(String tableName, Object idValue) throws SQLException {
         List<ColumnDataDTO> result = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>();
+        Map<String, ColumnDataDTO> metaMap = new HashMap<>();
+        String idColumn;
 
+        // 1. Lấy metadata (primary key + columns)
         try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
+            // Lấy primary key
             List<String> primaryKeys = new ArrayList<>();
-            try (ResultSet pkRs = metaData.getPrimaryKeys(Objects.nonNull(conn.getCatalog()) ? conn.getCatalog() : null, Objects.nonNull(conn.getSchema()) ? conn.getSchema() : null, tableName.toUpperCase())) {
+            try (ResultSet pkRs = metaData.getPrimaryKeys(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase())) {
                 while (pkRs.next()) {
                     primaryKeys.add(pkRs.getString("COLUMN_NAME"));
                 }
@@ -281,58 +287,49 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                 throw new SQLException("Table " + tableName + " has multiple primary keys (composite PK not supported).");
             }
 
-            String idColumn = primaryKeys.get(0);
+            idColumn = primaryKeys.get(0);
 
-            ResultSet columns = metaData.getColumns(Objects.nonNull(conn.getCatalog()) ? conn.getCatalog() : null, Objects.nonNull(conn.getSchema()) ? conn.getSchema() : null, tableName.toUpperCase(), null);
-            List<String> columnNames = new ArrayList<>();
-            Map<String, ColumnDataDTO> metaMap = new HashMap<>();
+            // Lấy column info
+            try (ResultSet columns = metaData.getColumns(conn.getCatalog(), conn.getSchema(), tableName.toUpperCase(), null)) {
+                while (columns.next()) {
+                    String columnName = columns.getString("COLUMN_NAME");
+                    ColumnDataDTO col = new ColumnDataDTO();
+                    col.setColumnName(columnName);
+                    col.setTypeName(columns.getString("TYPE_NAME"));
+                    col.setSize(columns.getInt("COLUMN_SIZE"));
+                    col.setNullable(columns.getInt("NULLABLE") == DatabaseMetaData.columnNullable);
+                    col.setRemarks(columns.getString("REMARKS"));
+                    col.setDefaultValue(columns.getString("COLUMN_DEF"));
+                    col.setPrimaryKey(primaryKeys.contains(columnName));
 
-            while (columns.next()) {
-                String columnName = columns.getString("COLUMN_NAME");
-                String typeName = columns.getString("TYPE_NAME");
-                int size = columns.getInt("COLUMN_SIZE");
-                int nullable = columns.getInt("NULLABLE");
-                String remarks = columns.getString("REMARKS");
-                String defaultValue = columns.getString("COLUMN_DEF");
-
-                ColumnDataDTO col = new ColumnDataDTO();
-                col.setColumnName(columnName);
-                col.setTypeName(typeName);
-                col.setSize(size);
-                col.setNullable(nullable == DatabaseMetaData.columnNullable);
-                col.setRemarks(remarks);
-                col.setDefaultValue(defaultValue);
-                col.setPrimaryKey(primaryKeys.contains(columnName));
-
-                columnNames.add(columnName);
-                metaMap.put(columnName, col);
-            }
-
-            int batchSize = 30;
-            for (int i = 0; i < columnNames.size(); i += batchSize) {
-                List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
-                String sql = "SELECT " + String.join(", ", batch) +
-                        " FROM " + tableName +
-                        " WHERE " + idColumn + " = ?";
-
-                try {
-                    Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
-                    for (String colName : batch) {
-                        if (metaMap.containsKey(colName)) {
-                            ColumnDataDTO col = metaMap.get(colName);
-                            col.setValue(row.get(colName));
-                        }
-                    }
-                } catch (DataAccessException e) {
-                    log.error(e.getMessage(), e);
+                    columnNames.add(columnName);
+                    metaMap.put(columnName, col);
                 }
             }
+        } // conn đóng ngay sau khi lấy metadata
 
-            for (String colName : columnNames) {
-                result.add(metaMap.get(colName));
+        // 2. Query dữ liệu theo batch
+        int batchSize = 30;
+        for (int i = 0; i < columnNames.size(); i += batchSize) {
+            List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
+            String sql = "SELECT " + String.join(", ", batch) +
+                    " FROM " + tableName +
+                    " WHERE " + idColumn + " = ?";
+
+            try {
+                Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
+                for (String colName : batch) {
+                    ColumnDataDTO col = metaMap.get(colName);
+                    if (col != null) {
+                        col.setValue(row.get(colName));
+                    }
+                }
+            } catch (DataAccessException e) {
+                log.error("No data found for table {} with {}={}: {}", tableName, idColumn, idValue, e.getMessage());
             }
         }
 
+        result.addAll(metaMap.values());
         return result;
     }
 
@@ -340,10 +337,17 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
     public List<ColumnDataDTO> getRecordWithMetadata(String tableName, String primaryKey, Object idValue) throws SQLException {
         List<ColumnDataDTO> result = new ArrayList<>();
 
-        try (Connection conn = Objects.requireNonNull(jdbcTemplate().getDataSource()).getConnection()) {
+        DataSource dataSource = Objects.requireNonNull(jdbcTemplate().getDataSource());
+        try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
 
-            ResultSet columns = metaData.getColumns(Objects.nonNull(conn.getCatalog()) ? conn.getCatalog() : null, Objects.nonNull(conn.getSchema()) ? conn.getSchema() : null, tableName.toUpperCase(), null);
+            ResultSet columns = metaData.getColumns(
+                    conn.getCatalog(),
+                    conn.getSchema(),
+                    tableName.toUpperCase(),
+                    null
+            );
+
             List<String> columnNames = new ArrayList<>();
             Map<String, ColumnDataDTO> metaMap = new HashMap<>();
 
@@ -362,31 +366,32 @@ public abstract class JdbcBaseRepository<T extends BaseEntity> implements JdbcRe
                 col.setNullable(nullable == DatabaseMetaData.columnNullable);
                 col.setRemarks(remarks);
                 col.setDefaultValue(defaultValue);
-                col.setPrimaryKey(primaryKey.contains(columnName));
+                col.setPrimaryKey(primaryKey.equalsIgnoreCase(columnName));
 
                 columnNames.add(columnName);
                 metaMap.put(columnName, col);
             }
 
-            int batchSize = 30;
-            if (Objects.nonNull(idValue)) {
+            if (idValue != null) {
+                int batchSize = 30;
                 for (int i = 0; i < columnNames.size(); i += batchSize) {
                     List<String> batch = columnNames.subList(i, Math.min(i + batchSize, columnNames.size()));
                     String sql = "SELECT " + String.join(", ", batch) +
                             " FROM " + tableName +
                             " WHERE " + primaryKey + " = ?";
 
-                    try {
-                        Map<String, Object> row = jdbcTemplate().queryForMap(sql, idValue);
-                        for (String colName : batch) {
-                            if (metaMap.containsKey(colName)) {
-                                ColumnDataDTO col = metaMap.get(colName);
-                                col.setValue(row.get(colName));
+                    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                        ps.setObject(1, idValue);
+                        try (ResultSet rs = ps.executeQuery()) {
+                            if (rs.next()) {
+                                for (String colName : batch) {
+                                    if (metaMap.containsKey(colName)) {
+                                        ColumnDataDTO col = metaMap.get(colName);
+                                        col.setValue(rs.getObject(colName));
+                                    }
+                                }
                             }
                         }
-                    } catch (DataAccessException e) {
-                        log.error(e.getMessage(), e);
-                        eventPublisher.publishEvent(new ErrorEvent(this, "No Data Available", "There are no records to display at the moment."));
                     }
                 }
             }
