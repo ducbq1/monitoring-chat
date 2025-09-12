@@ -94,7 +94,7 @@ public class MyWebSocketClient extends Endpoint {
                     URI uri = new URI("ws://localhost:9090/ws");
 
                     // Create a custom header configuration
-                    String jwtToken = AuthHelper.getToken("steve", "GDV", "App1", "api-key-1");
+                    String jwtToken = AuthHelper.getToken("steve", "GDV", "teller", "api-key-2");
                     ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
                         @Override
                         public void beforeRequest(Map<String, List<String>> headers) {

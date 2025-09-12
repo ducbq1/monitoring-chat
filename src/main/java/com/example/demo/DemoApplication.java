@@ -5,6 +5,7 @@ import com.example.demo.config.DynamicDataSourceConfig;
 import com.example.demo.event.EventBus;
 import com.example.demo.event.MessageReceivedEvent;
 import com.example.demo.event.PrintMessageListener;
+import com.example.demo.jar.JarHandler;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
@@ -41,7 +42,19 @@ public class DemoApplication {
 
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(DemoApplication.class, args);
+//        SpringApplication.run(DemoApplication.class, args);
+
+        String jarFilePath = "F:\\DOCUMENT\\patchTeller.jar";
+
+        String[] filePaths = {
+                "/Teller/branches/Rel_2.0_maint/TPTeller/com/example/demo/dto/request/LogRequestDTO.java",
+                "/Teller/branches/Rel_2.0_maint/TPTeller/com/example/demo/dto/request/TestRequestDTO.java",
+        };
+
+        JarHandler.addFilesToJar(jarFilePath, filePaths);
+
+        System.out.println("Các file đã được thêm vào JAR.");
+
         EventBus bus = new EventBus();
         bus.subscribe(MessageReceivedEvent.class, new PrintMessageListener());
         new Thread(() -> {
@@ -58,7 +71,7 @@ public class DemoApplication {
 
         String jwtToken = null;
         try {
-            jwtToken = AuthHelper.getToken("steve", "GDV", "App1", "api-key-1");
+            jwtToken = AuthHelper.getToken("steve", "GDV", "teller", "api-key-2");
         } catch (Exception e) {
             System.err.println("Get token failed " + e.getMessage());
         }
@@ -79,7 +92,7 @@ public class DemoApplication {
     private void connect_1() throws Exception {
         String jwtToken = null;
         try {
-            jwtToken = AuthHelper.getToken("steve", "GDV", "App1", "api-key-1");
+            jwtToken = AuthHelper.getToken("steve", "GDV", "teller", "api-key-2");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -90,7 +103,7 @@ public class DemoApplication {
             } catch (Exception e) {
                 if (e.getMessage().contains("401") || e.getMessage().contains("Unauthorized")) {
                     AuthHelper.invalidateToken();
-                    String newToken = AuthHelper.getToken("steve", "GDV", "App1", "api-key-1");
+                    String newToken = AuthHelper.getToken("steve", "GDV", "teller", "api-key-2");
                     connectAndListen(newToken);
                 } else {
                     System.out.println("Mất kết nối: " + e.getMessage());
