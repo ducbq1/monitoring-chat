@@ -42,19 +42,7 @@ public class DemoApplication {
 
 
     public static void main(String[] args) throws Exception {
-//        SpringApplication.run(DemoApplication.class, args);
-
-        String jarFilePath = "F:\\DOCUMENT\\patchTeller.jar";
-
-        String[] filePaths = {
-                "/Teller/branches/Rel_2.0_maint/TPTeller/com/example/demo/dto/request/LogRequestDTO.java",
-                "/Teller/branches/Rel_2.0_maint/TPTeller/com/example/demo/dto/request/TestRequestDTO.java",
-        };
-
-        JarHandler.addFilesToJar(jarFilePath, filePaths);
-
-        System.out.println("Các file đã được thêm vào JAR.");
-
+        SpringApplication.run(DemoApplication.class, args);
         EventBus bus = new EventBus();
         bus.subscribe(MessageReceivedEvent.class, new PrintMessageListener());
         new Thread(() -> {
